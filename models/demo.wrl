@@ -1,0 +1,113 @@
+#VRML V2.0 utf8
+Transform {
+	children [
+		DEF alphaRobot Transform {
+			# Currently we do not have a tabletop, therefore the robot is 1cm lower
+			translation -0.45 0 -0.01
+			rotation 0 0 1 1.570796327
+			children [
+				Inline {
+					url "robot.wrl"
+				}
+			]
+		}
+		DEF bravoRobot Transform {
+			# Currently we do not have a tabletop, therefore the robot is 1cm lower
+			translation 0.45 0 -0.01
+			rotation 0 0 1 -1.570796327
+			children [
+				Inline {
+					url "robot.wrl"
+				}
+			]
+		}
+		DEF environment Transform {
+			children [
+				Inline {
+					url "environment.wrl"
+				}
+			]
+		}
+		Transform {
+			translation -0.125 0.515 -0.0515
+			rotation 1 0 0 3.1415
+			children [
+				DEF tool-schmalz-ecpbi Transform {
+					rotation 0 0 1 0.785398
+					children [
+						DEF schmalz-ecpbi Transform {
+							children [
+								Transform {
+									rotation 1 0 0 3.1415
+									children [
+										Inline {
+											url "toolplate.wrl"
+										}
+									]
+								}
+								Transform {
+									children [
+										Inline {
+											url "schmalz-ecbpi.wrl"
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+		Transform {
+			translation 0.125 0.515 -0.0515
+			rotation 1 0 0 3.1415
+			children [
+				DEF tool-robotiq-2f-85 Transform {
+					rotation 0 0 1 0.785398
+					children [
+						DEF robotiq-2f-85 Transform {
+							children [
+								Transform {
+									rotation 1 0 0 3.1415
+									children [
+										Inline {
+											url "toolplate.wrl"
+										}
+									]
+								}
+								Transform {
+									rotation 1 0 0 3.1415
+									children [
+										Inline {
+											url "robotiq-2f-85.wrl"
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+		Transform {
+			translation 0.05 0.10 0
+			rotation 1 0 0 1.5708
+			children [
+				DEF object-cube-green Transform {
+					children [
+						DEF cube-green Transform {
+							children [
+								Inline {
+									url "cube.wrl"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+
+
+	]
+}
+

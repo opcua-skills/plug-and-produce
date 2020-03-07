@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ModelDesign
+  xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:OpcUa="http://opcfoundation.org/UA/"
+  xmlns:DI="http://opcfoundation.org/UA/DI/"
+  xmlns:DEVICE="https://fortiss.org/UA/Device/"
+  xmlns:SEMANTIC_MES="https://fortiss.org/UA/SemanticMES/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  TargetNamespace="https://fortiss.org/UA/SemanticMES/"
+  TargetXmlNamespace="https://fortiss.org/UA/SemanticMES/"
+  TargetVersion="0.9.0"
+  TargetPublicationDate="2018-06-24T00:00:00Z"
+  xmlns="http://opcfoundation.org/UA/ModelDesign.xsd">
+
+  <Namespaces>
+    <Namespace Name="SemanticMES" Prefix="SemanticMES" XmlNamespace="https://fortiss.org/UA/SemanticMES/Types.xsd" XmlPrefix="SemanticMES">https://fortiss.org/UA/SemanticMES/</Namespace>
+
+    <Namespace Name="OpcUa" Version="1.03" PublicationDate="2013-12-02T00:00:00Z" Prefix="Opc.Ua" InternalPrefix="Opc.Ua.Server" XmlNamespace="http://opcfoundation.org/UA/2008/02/Types.xsd" XmlPrefix="OpcUa">http://opcfoundation.org/UA/</Namespace>
+    <Namespace Name="OpcUaDi" Prefix="Opc.Ua.Di" XmlNamespace="http://opcfoundation.org/UA/DI/Types.xsd" XmlPrefix="DI" FilePath="OpcUaDiModel">http://opcfoundation.org/UA/DI/</Namespace>
+
+    <Namespace Name="fortissDevice" Prefix="fortiss_Device" XmlNamespace="https://fortiss.org/UA/Device/Types.xsd" XmlPrefix="fortiss_Device" FilePath="../deps/common/deps/robotics_cs/deps/device/fortissDeviceModel">https://fortiss.org/UA/Device/</Namespace>
+
+  </Namespaces>
+
+  <!-- ### Reference Types ###-->
+
+
+  <!-- ### Object Types ###-->
+
+
+
+  <ObjectType SymbolicName="SEMANTIC_MES:ExecuteProcessSkillType" BaseType="DEVICE:SkillType" IsAbstract="false">
+    <BrowseName>ExecuteProcessSkill</BrowseName>
+    <Description>Starts the execution of a generic process</Description>
+    <Children>
+      <Object SymbolicName="DI:ParameterSet" ModellingRule="Mandatory">
+        <Children>
+          <Variable SymbolicName="SEMANTIC_MES:AbstractProcessIri" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:String" ModellingRule="Mandatory" ValueRank="Scalar" AccessLevel="ReadWrite">
+            <Description>The IRI of the process to be executed</Description>
+            <DefaultValue>
+              <uax:String>http://www.fortiss.org/ont/databackbone/process-1#Process-1</uax:String>
+            </DefaultValue>
+          </Variable>
+          <Variable SymbolicName="SEMANTIC_MES:ExecutionMode" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:String" ModellingRule="Mandatory" ValueRank="Scalar" AccessLevel="ReadWrite">
+            <Description>The IRI of the execution mode</Description>
+            <DefaultValue>
+              <uax:String>http://www.fortiss.org/ont/robotics/core#ExecutionMode-RealExecution</uax:String>
+            </DefaultValue>
+          </Variable>
+        </Children>
+      </Object>
+    </Children>
+  </ObjectType>
+
+
+  <ObjectType SymbolicName="SEMANTIC_MES:SemanticMesType" BaseType="DI:DeviceType" IsAbstract="false">
+  </ObjectType>
+
+  <!-- Sommer automatic gripper Device -->
+  <Object SymbolicName="SEMANTIC_MES:SemanticMes" TypeDefinition="SEMANTIC_MES:SemanticMesType" SupportsEvents="true">
+    <Description>The Semantic MES</Description>
+    <Children>
+      <Object SymbolicName="DEVICE:Skills" TypeDefinition="OpcUa:BaseObjectType" ModellingRule="Mandatory">
+        <Description>Contains the skills of the semantic MES</Description>
+        <Children>
+          <Object SymbolicName="SEMANTIC_MES:ExecuteProcessSkill" TypeDefinition="SEMANTIC_MES:ExecuteProcessSkillType" ModellingRule="Mandatory" />
+        </Children>
+      </Object>
+      <Object SymbolicName="SEMANTIC_MES:Status" TypeDefinition="OpcUa:BaseObjectType" ModellingRule="Mandatory">
+        <Description>Process status structure</Description>
+      </Object>
+    </Children>
+    <References>
+      <Reference IsInverse="false">
+        <ReferenceType>OpcUa:HasInterface</ReferenceType>
+        <TargetId>DEVICE:ISkillControllerType</TargetId>
+      </Reference>
+      <Reference IsInverse="true">
+        <ReferenceType>OpcUa:Organizes</ReferenceType>
+        <TargetId>DI:DeviceSet</TargetId>
+      </Reference>
+    </References>
+  </Object>
+
+  <!-- ### Variable Types ###-->
+
+</ModelDesign>

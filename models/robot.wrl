@@ -1,0 +1,80 @@
+#VRML V2.0 utf8
+Transform {
+	children [
+		DEF link0 Transform {
+			children [
+				Inline {
+					url "ur5/link0.wrl"
+				}
+				Inline {
+					url "frame.wrl"
+				}
+			]
+		}
+		DEF link1 Transform {
+			translation 0 0 0.0892
+			rotation 1 0 0 1.570796
+			children [
+				Inline {
+					url "ur5/link1.wrl"
+				}
+			]
+		}
+		DEF link2 Transform {
+			translation -0.425 0 0.0892
+			rotation 1 0 0 1.570796
+			children [
+				Inline {
+					url "ur5/link2.wrl"
+				}
+			]
+		}
+		DEF link3 Transform {
+			translation -0.81743 0 0.0892
+			rotation 1 0 0 1.570796
+			children [
+				Inline {
+					url "ur5/link3.wrl"
+				}
+			]
+		}
+		DEF link4 Transform {
+			translation -0.81743 -0.109 0.0892
+			rotation 1 0 0 3.141593
+			children [
+				Inline {
+					url "ur5/link4.wrl"
+				}
+			]
+		}
+		DEF link5 Transform {
+			translation -0.81743 -0.109 0.0038
+			rotation 1 0 0 1.570796
+			children [
+				Inline {
+					url "ur5/link5.wrl"
+				}
+			]
+		}
+		DEF link6 Transform {
+			translation -0.81743 -0.191 0.0038
+			rotation 1 0 0 1.570796
+			children [
+				Inline {
+					url "ur5/link6.wrl"
+				}
+				Inline {
+					url "frame.wrl"
+				}
+				Transform {
+					rotation 0 0 1 1.570796
+					children [
+						Inline {
+							url "masterplate-locked.wrl"
+						}
+					]
+				}
+			]
+		}
+	]
+}

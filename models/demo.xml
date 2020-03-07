@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rlsg xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="rlsg.xsd">
+	<scene href="demo.wrl">
+		<model name="alphaRobot">
+			<body name="link0"/>
+			<body name="link1"/>
+			<body name="link2"/>
+			<body name="link3"/>
+			<body name="link4"/>
+			<body name="link5"/>
+			<body name="link6"/>
+		</model>
+		<model name="bravoRobot">
+			<body name="link0"/>
+			<body name="link1"/>
+			<body name="link2"/>
+			<body name="link3"/>
+			<body name="link4"/>
+			<body name="link5"/>
+			<body name="link6"/>
+		</model>
+		<model name="environment">
+			<body name="table"/>
+		</model>
+		<model name="tool-schmalz-ecpbi">
+			<body name="schmalz-ecpbi"/>
+		</model>
+		<model name="tool-robotiq-2f-85">
+			<body name="robotiq-2f-85"/>
+		</model>
+		<model name="object-cube-green">
+			<body name="cube-green"/>
+		</model>
+	</scene>
+</rlsg>

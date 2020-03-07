@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ModelDesign
+  xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:OpcUa="http://opcfoundation.org/UA/"
+  xmlns:DI="http://opcfoundation.org/UA/DI/"
+  xmlns:DEVICE="https://fortiss.org/UA/Device/"
+  xmlns:KELVIN_TOOLCHANGER="https://fortiss.org/UA/KelvinToolchanger/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  TargetNamespace="https://fortiss.org/UA/KelvinToolchanger/"
+  TargetXmlNamespace="https://fortiss.org/UA/KelvinToolchanger/"
+  TargetVersion="0.9.0"
+  TargetPublicationDate="2018-06-24T00:00:00Z"
+  xmlns="http://opcfoundation.org/UA/ModelDesign.xsd">
+
+  <Namespaces>
+    <Namespace Name="KelvinToolchanger" Prefix="KelvinToolchanger" XmlNamespace="https://fortiss.org/UA/KelvinToolchanger/Types.xsd" XmlPrefix="KelvinToolchanger">https://fortiss.org/UA/KelvinToolchanger/</Namespace>
+
+    <Namespace Name="OpcUa" Version="1.03" PublicationDate="2013-12-02T00:00:00Z" Prefix="Opc.Ua" InternalPrefix="Opc.Ua.Server" XmlNamespace="http://opcfoundation.org/UA/2008/02/Types.xsd" XmlPrefix="OpcUa">http://opcfoundation.org/UA/</Namespace>
+    <Namespace Name="OpcUaDi" Prefix="Opc.Ua.Di" XmlNamespace="http://opcfoundation.org/UA/DI/Types.xsd" XmlPrefix="DI" FilePath="OpcUaDiModel">http://opcfoundation.org/UA/DI/</Namespace>
+
+    <Namespace Name="fortissDevice" Prefix="fortiss_Device" XmlNamespace="https://fortiss.org/UA/Device/Types.xsd" XmlPrefix="fortiss_Device" FilePath="../deps/common/deps/robotics_cs/deps/device/fortissDeviceModel">https://fortiss.org/UA/Device/</Namespace>
+
+  </Namespaces>
+
+  <!-- ### Reference Types ###-->
+
+
+  <!-- ### Object Types ###-->
+
+
+
+  <ObjectType SymbolicName="KELVIN_TOOLCHANGER:ChangeToolSkillType" BaseType="DEVICE:SkillType" IsAbstract="false">
+    <BrowseName>ChangeToolSkill</BrowseName>
+    <Description>Change the currently connected tool of the robot using the kelvin toolchanger</Description>
+    <Children>
+      <Object SymbolicName="DI:ParameterSet" ModellingRule="Mandatory">
+        <Children>
+          <Variable SymbolicName="KELVIN_TOOLCHANGER:ToolPosition" TypeDefinition="OpcUa:ThreeDFrameType"
+                    DataType="OpcUa:ThreeDFrame" ModellingRule="Mandatory" ValueRank="Scalar"
+                    AccessLevel="ReadWrite">
+            <Description>Position of the tool relative to the robot base in cartesian space</Description>
+          </Variable>
+          <Variable SymbolicName="KELVIN_TOOLCHANGER:ToolAppUri" TypeDefinition="OpcUa:BaseDataVariableType"
+                    DataType="OpcUa:String" ModellingRule="Mandatory" ValueRank="Scalar"
+                    AccessLevel="ReadWrite">
+            <Description>Expected application uri of the tool</Description>
+          </Variable>
+        </Children>
+      </Object>
+    </Children>
+  </ObjectType>
+
+  <ObjectType SymbolicName="KELVIN_TOOLCHANGER:DropToolSkillType" BaseType="DEVICE:SkillType" IsAbstract="false">
+    <BrowseName>DropToolSkill</BrowseName>
+    <Description>Drop the currently connected tool of the robot to the dock where it was picked up</Description>
+    <Children>
+      <Object SymbolicName="DI:ParameterSet" ModellingRule="Mandatory">
+        <Children>
+        </Children>
+      </Object>
+    </Children>
+  </ObjectType>
+
+  <ObjectType SymbolicName="KELVIN_TOOLCHANGER:ToolInfoType" BaseType="OpcUa:BaseObjectType" IsAbstract="false">
+    <BrowseName>ToolInfoType</BrowseName>
+    <Children>
+      <Variable SymbolicName="KELVIN_TOOLCHANGER:Ready" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:Boolean" ModellingRule="Mandatory" ValueRank="Scalar" AccessLevel="Read">
+        <Description>True if the connected tool is ready (started up)</Description>
+      </Variable>
+      <Variable SymbolicName="KELVIN_TOOLCHANGER:Id" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:UInt16" ModellingRule="Mandatory" ValueRank="Scalar" AccessLevel="Read">
+        <Description>The id of the tool based on the Kelvin Toolchanger IDs</Description>
+      </Variable>
+      <Variable SymbolicName="KELVIN_TOOLCHANGER:Description" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:ApplicationDescription" ModellingRule="Mandatory" ValueRank="Scalar" AccessLevel="Read">
+        <Description>The application description of the connected tool</Description>
+      </Variable>
+      <Variable SymbolicName="KELVIN_TOOLCHANGER:Endpoint" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:String" ModellingRule="Mandatory" ValueRank="Scalar" AccessLevel="Read">
+        <Description>The endpoint url of the connected tool</Description>
+      </Variable>
+    </Children>
+  </ObjectType>
+
+  <ObjectType SymbolicName="KELVIN_TOOLCHANGER:KelvinToolchangerType" BaseType="DI:DeviceType" IsAbstract="false">
+  </ObjectType>
+
+  <!-- Sommer automatic gripper Device -->
+  <Object SymbolicName="KELVIN_TOOLCHANGER:KelvinToolchanger" TypeDefinition="KELVIN_TOOLCHANGER:KelvinToolchangerType" SupportsEvents="true">
+    <Description>The Kelvin Toolchanger</Description>
+    <Children>
+      <Object SymbolicName="DEVICE:Skills" TypeDefinition="OpcUa:BaseObjectType" ModellingRule="Mandatory">
+        <Description>Contains the skills of the semantic MES</Description>
+        <Children>
+          <Object SymbolicName="KELVIN_TOOLCHANGER:ChangeToolSkill" TypeDefinition="KELVIN_TOOLCHANGER:ChangeToolSkillType" ModellingRule="Mandatory" />
+          <Object SymbolicName="KELVIN_TOOLCHANGER:DropToolSkill" TypeDefinition="KELVIN_TOOLCHANGER:DropToolSkillType" ModellingRule="Mandatory" />
+        </Children>
+      </Object>
+      <Variable SymbolicName="KELVIN_TOOLCHANGER:HasTool" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:Boolean" ModellingRule="Mandatory" ValueRank="Scalar" AccessLevel="Read">
+        <Description>True if the toolchanger currently has a tool attached.</Description>
+      </Variable>
+      <Object SymbolicName="KELVIN_TOOLCHANGER:CurrentTool" TypeDefinition="KELVIN_TOOLCHANGER:ToolInfoType" ModellingRule="Mandatory">
+        <Description>Info on current tool</Description>
+      </Object>
+    </Children>
+    <References>
+      <Reference IsInverse="false">
+        <ReferenceType>OpcUa:HasInterface</ReferenceType>
+        <TargetId>DEVICE:ISkillControllerType</TargetId>
+      </Reference>
+      <Reference IsInverse="true">
+        <ReferenceType>OpcUa:Organizes</ReferenceType>
+        <TargetId>DI:DeviceSet</TargetId>
+      </Reference>
+    </References>
+  </Object>
+
+  <!-- ### Variable Types ###-->
+
+</ModelDesign>

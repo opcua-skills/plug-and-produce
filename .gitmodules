@@ -1,0 +1,32 @@
+[submodule "gripper/robotiq-2f/main/deps/common"]
+	path = gripper/robotiq-2f/main/deps/common
+	url = https://github.com/opcua-skills/skills-common.git
+	branch = master
+[submodule "gripper/robotiq-2f/components/open62541/repo"]
+	path = gripper/robotiq-2f/components/open62541/repo
+	url = https://github.com/open62541/open62541.git
+	branch = master
+[submodule "gripper/schmalz-ecbpi/components/open62541/repo"]
+	path = gripper/schmalz-ecbpi/components/open62541/repo
+	url = https://github.com/open62541/open62541.git
+	branch = master
+[submodule "gripper/schmalz-ecbpi/main/deps/common"]
+	path = gripper/schmalz-ecbpi/main/deps/common
+	url = https://github.com/opcua-skills/skills-common.git
+	branch = master
+[submodule "robot/universal-robots/deps/common"]
+	path = robot/universal-robots/deps/common
+	url = https://github.com/opcua-skills/skills-common.git
+	branch = master
+[submodule "software/composite-skills/deps/common"]
+	path = software/composite-skills/deps/common
+	url = https://github.com/opcua-skills/skills-common.git
+	branch = master
+[submodule "software/kelvin-toolchanger/deps/common"]
+	path = software/kelvin-toolchanger/deps/common
+	url = https://github.com/opcua-skills/skills-common.git
+	branch = master
+[submodule "software/semantic-mes/deps/common"]
+	path = software/semantic-mes/deps/common
+	url = https://github.com/opcua-skills/skills-common.git
+	branch = master

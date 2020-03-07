@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ModelDesign
+  xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:OpcUa="http://opcfoundation.org/UA/"
+  xmlns:DI="http://opcfoundation.org/UA/DI/"
+  xmlns:DEVICE="https://fortiss.org/UA/Device/"
+  xmlns:COMPOSITE_SKILLS="https://fortiss.org/UA/CompositeSkills/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  TargetNamespace="https://fortiss.org/UA/CompositeSkills/"
+  TargetXmlNamespace="https://fortiss.org/UA/CompositeSkills/"
+  TargetVersion="0.9.0"
+  TargetPublicationDate="2018-06-24T00:00:00Z"
+  xmlns="http://opcfoundation.org/UA/ModelDesign.xsd">
+
+  <Namespaces>
+    <Namespace Name="CompositeSkills" Prefix="CompositeSkills" XmlNamespace="https://fortiss.org/UA/CompositeSkills/Types.xsd" XmlPrefix="CompositeSkills">https://fortiss.org/UA/CompositeSkills/</Namespace>
+
+    <Namespace Name="OpcUa" Version="1.03" PublicationDate="2013-12-02T00:00:00Z" Prefix="Opc.Ua" InternalPrefix="Opc.Ua.Server" XmlNamespace="http://opcfoundation.org/UA/2008/02/Types.xsd" XmlPrefix="OpcUa">http://opcfoundation.org/UA/</Namespace>
+    <Namespace Name="OpcUaDi" Prefix="Opc.Ua.Di" XmlNamespace="http://opcfoundation.org/UA/DI/Types.xsd" XmlPrefix="DI" FilePath="OpcUaDiModel">http://opcfoundation.org/UA/DI/</Namespace>
+
+    <Namespace Name="fortissDevice" Prefix="fortiss_Device" XmlNamespace="https://fortiss.org/UA/Device/Types.xsd" XmlPrefix="fortiss_Device" FilePath="../deps/common/deps/robotics_cs/deps/device/fortissDeviceModel">https://fortiss.org/UA/Device/</Namespace>
+
+  </Namespaces>
+
+  <!-- ### Reference Types ###-->
+
+
+  <!-- ### Object Types ###-->
+
+  <ObjectType SymbolicName="COMPOSITE_SKILLS:PickAndPlaceSkillType" BaseType="DEVICE:SkillType" IsAbstract="false">
+    <BrowseName>PickAndPlaceSkill</BrowseName>
+    <Description>Pick and Place skill</Description>
+    <Children>
+      <Object SymbolicName="DI:ParameterSet" ModellingRule="Mandatory">
+        <Children>
+          <Variable SymbolicName="COMPOSITE_SKILLS:ObjectId" TypeDefinition="OpcUa:BaseDataVariableType"
+                    DataType="OpcUa:String" ModellingRule="Mandatory" ValueRank="Scalar"
+                    AccessLevel="ReadWrite">
+            <Description>Id of the object which should be picked.</Description>
+          </Variable>
+          <Variable SymbolicName="COMPOSITE_SKILLS:ToolSkillControllerEndpoint" TypeDefinition="OpcUa:BaseDataVariableType"
+                    DataType="OpcUa:String" ModellingRule="Mandatory" ValueRank="Scalar"
+                    AccessLevel="ReadWrite">
+            <Description>The endpoint URL of the gripper tool controller which should be used for this skill</Description>
+          </Variable>
+          <Variable SymbolicName="COMPOSITE_SKILLS:MoveSkillControllerEndpoint" TypeDefinition="OpcUa:BaseDataVariableType"
+                    DataType="OpcUa:String" ModellingRule="Mandatory" ValueRank="Scalar"
+                    AccessLevel="ReadWrite">
+            <Description>The endpoint URL of the move controller which should be used for this skill</Description>
+          </Variable>
+          <Variable SymbolicName="COMPOSITE_SKILLS:PlacePosition" TypeDefinition="OpcUa:ThreeDFrameType"
+                    DataType="OpcUa:ThreeDFrame" ModellingRule="Mandatory" ValueRank="Scalar"
+                    AccessLevel="ReadWrite">
+            <Description>Position where the object should be placed, based on the world frame to object frame</Description>
+          </Variable>
+        </Children>
+      </Object>
+    </Children>
+  </ObjectType>
+
+  <ObjectType SymbolicName="COMPOSITE_SKILLS:CompositeSkillsType" BaseType="DI:DeviceType" IsAbstract="false">
+  </ObjectType>
+
+  <!-- Sommer automatic gripper Device -->
+  <Object SymbolicName="COMPOSITE_SKILLS:CompositeSkills" TypeDefinition="COMPOSITE_SKILLS:CompositeSkillsType" SupportsEvents="true">
+    <Description>The Kelvin Toolchanger</Description>
+    <Children>
+      <Object SymbolicName="DEVICE:Skills" TypeDefinition="OpcUa:BaseObjectType" ModellingRule="Mandatory">
+        <Description>Contains the skills of the semantic MES</Description>
+        <Children>
+          <Object SymbolicName="COMPOSITE_SKILLS:PickAndPlaceSkill" TypeDefinition="COMPOSITE_SKILLS:PickAndPlaceSkillType" ModellingRule="Mandatory" />
+        </Children>
+      </Object>
+    </Children>
+    <References>
+      <Reference IsInverse="false">
+        <ReferenceType>OpcUa:HasInterface</ReferenceType>
+        <TargetId>DEVICE:ISkillControllerType</TargetId>
+      </Reference>
+      <Reference IsInverse="true">
+        <ReferenceType>OpcUa:Organizes</ReferenceType>
+        <TargetId>DI:DeviceSet</TargetId>
+      </Reference>
+    </References>
+  </Object>
+
+  <!-- ### Variable Types ###-->
+
+</ModelDesign>

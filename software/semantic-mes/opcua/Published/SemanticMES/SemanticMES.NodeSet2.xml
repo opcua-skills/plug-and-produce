@@ -1,0 +1,362 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<UANodeSet xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" LastModified="2018-06-24T00:00:00Z" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
+  <NamespaceUris>
+    <Uri>https://fortiss.org/UA/SemanticMES/</Uri>
+    <Uri>https://fortiss.org/UA/Device/</Uri>
+    <Uri>http://opcfoundation.org/UA/DI/</Uri>
+  </NamespaceUris>
+  <Models>
+    <Model ModelUri="https://fortiss.org/UA/SemanticMES/" Version="0.9.0" PublicationDate="2018-06-24T00:00:00Z">
+      <RequiredModel ModelUri="http://opcfoundation.org/UA/" Version="1.03" PublicationDate="2013-12-02T00:00:00Z" />
+      <RequiredModel ModelUri="http://opcfoundation.org/UA/DI/" Version="1.02" PublicationDate="2019-05-01T00:00:00Z" />
+      <RequiredModel ModelUri="https://fortiss.org/UA/Device/" Version="0.9.1" PublicationDate="2018-03-23T00:00:00Z" />
+    </Model>
+  </Models>
+  <Aliases>
+    <Alias Alias="Boolean">i=1</Alias>
+    <Alias Alias="SByte">i=2</Alias>
+    <Alias Alias="Byte">i=3</Alias>
+    <Alias Alias="Int16">i=4</Alias>
+    <Alias Alias="UInt16">i=5</Alias>
+    <Alias Alias="Int32">i=6</Alias>
+    <Alias Alias="UInt32">i=7</Alias>
+    <Alias Alias="Int64">i=8</Alias>
+    <Alias Alias="UInt64">i=9</Alias>
+    <Alias Alias="Float">i=10</Alias>
+    <Alias Alias="Double">i=11</Alias>
+    <Alias Alias="DateTime">i=13</Alias>
+    <Alias Alias="String">i=12</Alias>
+    <Alias Alias="ByteString">i=15</Alias>
+    <Alias Alias="Guid">i=14</Alias>
+    <Alias Alias="XmlElement">i=16</Alias>
+    <Alias Alias="NodeId">i=17</Alias>
+    <Alias Alias="ExpandedNodeId">i=18</Alias>
+    <Alias Alias="QualifiedName">i=20</Alias>
+    <Alias Alias="LocalizedText">i=21</Alias>
+    <Alias Alias="StatusCode">i=19</Alias>
+    <Alias Alias="Structure">i=22</Alias>
+    <Alias Alias="Number">i=26</Alias>
+    <Alias Alias="Integer">i=27</Alias>
+    <Alias Alias="UInteger">i=28</Alias>
+    <Alias Alias="HasComponent">i=47</Alias>
+    <Alias Alias="HasProperty">i=46</Alias>
+    <Alias Alias="Organizes">i=35</Alias>
+    <Alias Alias="HasEventSource">i=36</Alias>
+    <Alias Alias="HasNotifier">i=48</Alias>
+    <Alias Alias="HasSubtype">i=45</Alias>
+    <Alias Alias="HasTypeDefinition">i=40</Alias>
+    <Alias Alias="HasModellingRule">i=37</Alias>
+    <Alias Alias="HasEncoding">i=38</Alias>
+    <Alias Alias="HasDescription">i=39</Alias>
+  </Aliases>
+  <UAObjectType NodeId="ns=1;i=15001" BrowseName="1:ExecuteProcessSkill" SymbolicName="ExecuteProcessSkillType">
+    <DisplayName>ExecuteProcessSkill</DisplayName>
+    <Description>Starts the execution of a generic process</Description>
+    <References>
+      <Reference ReferenceType="HasComponent">ns=1;i=15068</Reference>
+      <Reference ReferenceType="HasSubtype" IsForward="false">ns=2;i=15034</Reference>
+    </References>
+  </UAObjectType>
+  <UAObject NodeId="ns=1;i=15068" BrowseName="3:ParameterSet" ParentNodeId="ns=1;i=15001">
+    <DisplayName>ParameterSet</DisplayName>
+    <References>
+      <Reference ReferenceType="HasComponent">ns=1;i=15069</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=15070</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=58</Reference>
+      <Reference ReferenceType="HasModellingRule">i=78</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15001</Reference>
+    </References>
+  </UAObject>
+  <UAVariable NodeId="ns=1;i=15069" BrowseName="1:AbstractProcessIri" ParentNodeId="ns=1;i=15068" DataType="String" AccessLevel="3">
+    <DisplayName>AbstractProcessIri</DisplayName>
+    <Description>The IRI of the process to be executed</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+      <Reference ReferenceType="HasModellingRule">i=78</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15068</Reference>
+    </References>
+    <Value>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://www.fortiss.org/ont/databackbone/process-1#Process-1</String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15070" BrowseName="1:ExecutionMode" ParentNodeId="ns=1;i=15068" DataType="String" AccessLevel="3">
+    <DisplayName>ExecutionMode</DisplayName>
+    <Description>The IRI of the execution mode</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+      <Reference ReferenceType="HasModellingRule">i=78</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15068</Reference>
+    </References>
+    <Value>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://www.fortiss.org/ont/robotics/core#ExecutionMode-RealExecution</String>
+    </Value>
+  </UAVariable>
+  <UAObjectType NodeId="ns=1;i=15071" BrowseName="1:SemanticMesType">
+    <DisplayName>SemanticMesType</DisplayName>
+    <References>
+      <Reference ReferenceType="HasSubtype" IsForward="false">ns=3;i=1002</Reference>
+    </References>
+  </UAObjectType>
+  <UAObject NodeId="ns=1;i=15141" BrowseName="1:SemanticMes" EventNotifier="1">
+    <DisplayName>SemanticMes</DisplayName>
+    <Description>The Semantic MES</Description>
+    <References>
+      <Reference ReferenceType="HasProperty">ns=1;i=15164</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=15166</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=15167</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=15168</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=15169</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=15171</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=15173</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=15175</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=15211</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=15279</Reference>
+      <Reference ReferenceType="i=17603">ns=2;i=15396</Reference>
+      <Reference ReferenceType="Organizes" IsForward="false">ns=3;i=5001</Reference>
+      <Reference ReferenceType="HasTypeDefinition">ns=1;i=15071</Reference>
+    </References>
+  </UAObject>
+  <UAVariable NodeId="ns=1;i=15164" BrowseName="3:Manufacturer" ParentNodeId="ns=1;i=15141" DataType="LocalizedText">
+    <DisplayName>Manufacturer</DisplayName>
+    <Description>Name of the company that manufactured the device</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15141</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15166" BrowseName="3:Model" ParentNodeId="ns=1;i=15141" DataType="LocalizedText">
+    <DisplayName>Model</DisplayName>
+    <Description>Model name of the device</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15141</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15167" BrowseName="3:HardwareRevision" ParentNodeId="ns=1;i=15141" DataType="String">
+    <DisplayName>HardwareRevision</DisplayName>
+    <Description>Revision level of the hardware of the device</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15141</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15168" BrowseName="3:SoftwareRevision" ParentNodeId="ns=1;i=15141" DataType="String">
+    <DisplayName>SoftwareRevision</DisplayName>
+    <Description>Revision level of the software/firmware of the device</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15141</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15169" BrowseName="3:DeviceRevision" ParentNodeId="ns=1;i=15141" DataType="String">
+    <DisplayName>DeviceRevision</DisplayName>
+    <Description>Overall revision level of the device</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15141</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15171" BrowseName="3:DeviceManual" ParentNodeId="ns=1;i=15141" DataType="String">
+    <DisplayName>DeviceManual</DisplayName>
+    <Description>Address (pathname in the file system or a URL | Web address) of user manual for the device</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15141</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15173" BrowseName="3:SerialNumber" ParentNodeId="ns=1;i=15141" DataType="String">
+    <DisplayName>SerialNumber</DisplayName>
+    <Description>Identifier that uniquely identifies, within a manufacturer, a device instance</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15141</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15175" BrowseName="3:RevisionCounter" ParentNodeId="ns=1;i=15141" DataType="Int32">
+    <DisplayName>RevisionCounter</DisplayName>
+    <Description>An incremental counter indicating the number of times the static data within the Device has been modified</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15141</Reference>
+    </References>
+  </UAVariable>
+  <UAObject NodeId="ns=1;i=15211" BrowseName="2:Skills" ParentNodeId="ns=1;i=15141">
+    <DisplayName>Skills</DisplayName>
+    <Description>Contains the skills of the semantic MES</Description>
+    <References>
+      <Reference ReferenceType="HasComponent">ns=1;i=15212</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=58</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15141</Reference>
+    </References>
+  </UAObject>
+  <UAObject NodeId="ns=1;i=15212" BrowseName="1:ExecuteProcessSkill" ParentNodeId="ns=1;i=15211">
+    <DisplayName>ExecuteProcessSkill</DisplayName>
+    <References>
+      <Reference ReferenceType="HasComponent">ns=1;i=15213</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=15218</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=15226</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=15227</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=15228</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=15244</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=15271</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=15272</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=15273</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=15274</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=15275</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=15276</Reference>
+      <Reference ReferenceType="HasTypeDefinition">ns=1;i=15001</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15211</Reference>
+    </References>
+  </UAObject>
+  <UAVariable NodeId="ns=1;i=15213" BrowseName="CurrentState" ParentNodeId="ns=1;i=15212" DataType="LocalizedText">
+    <DisplayName>CurrentState</DisplayName>
+    <References>
+      <Reference ReferenceType="HasProperty">ns=1;i=15214</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=15216</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=2760</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15212</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15214" BrowseName="Id" ParentNodeId="ns=1;i=15213" DataType="NodeId">
+    <DisplayName>Id</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15213</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15216" BrowseName="Number" ParentNodeId="ns=1;i=15213" DataType="UInt32">
+    <DisplayName>Number</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15213</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15218" BrowseName="LastTransition" ParentNodeId="ns=1;i=15212" DataType="LocalizedText">
+    <DisplayName>LastTransition</DisplayName>
+    <References>
+      <Reference ReferenceType="HasProperty">ns=1;i=15219</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=15221</Reference>
+      <Reference ReferenceType="HasProperty">ns=1;i=15222</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=2767</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15212</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15219" BrowseName="Id" ParentNodeId="ns=1;i=15218" DataType="NodeId">
+    <DisplayName>Id</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15218</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15221" BrowseName="Number" ParentNodeId="ns=1;i=15218" DataType="UInt32">
+    <DisplayName>Number</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15218</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15222" BrowseName="TransitionTime" ParentNodeId="ns=1;i=15218" DataType="i=294">
+    <DisplayName>TransitionTime</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15218</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15226" BrowseName="Deletable" ParentNodeId="ns=1;i=15212" DataType="Boolean">
+    <DisplayName>Deletable</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15212</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15227" BrowseName="AutoDelete" ParentNodeId="ns=1;i=15212" DataType="Boolean">
+    <DisplayName>AutoDelete</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15212</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15228" BrowseName="RecycleCount" ParentNodeId="ns=1;i=15212" DataType="Int32">
+    <DisplayName>RecycleCount</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15212</Reference>
+    </References>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15244" BrowseName="MaxInstanceCount" ParentNodeId="ns=1;i=15212" DataType="UInt32">
+    <DisplayName>MaxInstanceCount</DisplayName>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
+      <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15212</Reference>
+    </References>
+  </UAVariable>
+  <UAMethod NodeId="ns=1;i=15271" BrowseName="Halt" ParentNodeId="ns=1;i=15212" MethodDeclarationId="ns=2;i=15098">
+    <DisplayName>Halt</DisplayName>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15212</Reference>
+    </References>
+  </UAMethod>
+  <UAMethod NodeId="ns=1;i=15272" BrowseName="Reset" ParentNodeId="ns=1;i=15212" MethodDeclarationId="ns=2;i=15099">
+    <DisplayName>Reset</DisplayName>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15212</Reference>
+    </References>
+  </UAMethod>
+  <UAMethod NodeId="ns=1;i=15273" BrowseName="Resume" ParentNodeId="ns=1;i=15212" MethodDeclarationId="ns=2;i=15097">
+    <DisplayName>Resume</DisplayName>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15212</Reference>
+    </References>
+  </UAMethod>
+  <UAMethod NodeId="ns=1;i=15274" BrowseName="Suspend" ParentNodeId="ns=1;i=15212" MethodDeclarationId="ns=2;i=15096">
+    <DisplayName>Suspend</DisplayName>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15212</Reference>
+    </References>
+  </UAMethod>
+  <UAMethod NodeId="ns=1;i=15275" BrowseName="Start" ParentNodeId="ns=1;i=15212" MethodDeclarationId="ns=2;i=15095">
+    <DisplayName>Start</DisplayName>
+    <References>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15212</Reference>
+    </References>
+  </UAMethod>
+  <UAObject NodeId="ns=1;i=15276" BrowseName="3:ParameterSet" ParentNodeId="ns=1;i=15212">
+    <DisplayName>ParameterSet</DisplayName>
+    <References>
+      <Reference ReferenceType="HasComponent">ns=1;i=15277</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=15278</Reference>
+      <Reference ReferenceType="HasTypeDefinition">i=58</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15212</Reference>
+    </References>
+  </UAObject>
+  <UAVariable NodeId="ns=1;i=15277" BrowseName="1:AbstractProcessIri" ParentNodeId="ns=1;i=15276" DataType="String" AccessLevel="3">
+    <DisplayName>AbstractProcessIri</DisplayName>
+    <Description>The IRI of the process to be executed</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15276</Reference>
+    </References>
+    <Value>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://www.fortiss.org/ont/databackbone/process-1#Process-1</String>
+    </Value>
+  </UAVariable>
+  <UAVariable NodeId="ns=1;i=15278" BrowseName="1:ExecutionMode" ParentNodeId="ns=1;i=15276" DataType="String" AccessLevel="3">
+    <DisplayName>ExecutionMode</DisplayName>
+    <Description>The IRI of the execution mode</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15276</Reference>
+    </References>
+    <Value>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://www.fortiss.org/ont/robotics/core#ExecutionMode-RealExecution</String>
+    </Value>
+  </UAVariable>
+  <UAObject NodeId="ns=1;i=15279" BrowseName="1:Status" ParentNodeId="ns=1;i=15141">
+    <DisplayName>Status</DisplayName>
+    <Description>Process status structure</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=58</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15141</Reference>
+    </References>
+  </UAObject>
+</UANodeSet>

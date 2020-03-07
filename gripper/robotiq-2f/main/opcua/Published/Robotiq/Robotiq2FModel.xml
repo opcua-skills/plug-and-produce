@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ModelDesign
+        xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:OpcUa="http://opcfoundation.org/UA/"
+        xmlns:DI="http://opcfoundation.org/UA/DI/"
+        xmlns:DEVICE="https://fortiss.org/UA/Device/"
+        xmlns:ROBOTIQ="https://fortiss.org/UA/robotiq/"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        TargetNamespace="https://fortiss.org/UA/robotiq/"
+        TargetXmlNamespace="https://fortiss.org/UA/robotiq/"
+        TargetVersion="0.9.0"
+        TargetPublicationDate="2018-06-24T00:00:00Z"
+        xmlns="http://opcfoundation.org/UA/ModelDesign.xsd">
+
+    <Namespaces>
+        <Namespace Name="robotiq" Prefix="robotiq" XmlNamespace="https://fortiss.org/UA/robotiq/Types.xsd" XmlPrefix="robotiq">https://fortiss.org/UA/robotiq/</Namespace>
+        <Namespace Name="fortissDevice" Prefix="fortiss_Device" XmlNamespace="https://fortiss.org/UA/Device/Types.xsd" XmlPrefix="fortiss_Device" FilePath="../deps/common/deps/robotics_cs/deps/device/fortissDeviceModel">https://fortiss.org/UA/Device/</Namespace>
+        <Namespace Name="OpcUaDi" Prefix="Opc.Ua.Di" XmlNamespace="http://opcfoundation.org/UA/DI/Types.xsd" XmlPrefix="DI" FilePath="OpcUaModel">http://opcfoundation.org/UA/DI/</Namespace>
+        <Namespace Name="OpcUa" Version="1.03" PublicationDate="2013-12-02T00:00:00Z" Prefix="Opc.Ua" InternalPrefix="Opc.Ua.Server" XmlNamespace="http://opcfoundation.org/UA/2008/02/Types.xsd" XmlPrefix="OpcUa">http://opcfoundation.org/UA/</Namespace>
+    </Namespaces>
+
+    <!-- ### Reference Types ###-->
+
+
+    <!-- ### Object Types ###-->
+
+    <ObjectType SymbolicName="ROBOTIQ:Robotiq2FType" BaseType="DI:DeviceType" IsAbstract="false">
+    </ObjectType>
+
+    <!-- Sommer automatic gripper Device -->
+    <Object SymbolicName="ROBOTIQ:Robotiq2F" TypeDefinition="ROBOTIQ:Robotiq2FType" SupportsEvents="true">
+        <Description>Robotiq 2F Gripper</Description>
+        <Children>
+            <Method SymbolicName="DEVICE:PowerOffDevice" TypeDefinition="DEVICE:PowerOffDeviceMethodType"/>
+            <Object SymbolicName="DEVICE:Skills" TypeDefinition="OpcUa:BaseObjectType" ModellingRule="Mandatory">
+                <Description>Contains the skills of the gripper controller.</Description>
+                <Children>
+                    <!--Object SymbolicName="DEVICE:MoveGripperSkill" TypeDefinition="DEVICE:MoveGripperSkillType" ModellingRule="Optional" /-->
+                    <Object SymbolicName="DEVICE:ReleaseGripperSkill" TypeDefinition="DEVICE:ReleaseGripperSkillType" ModellingRule="Mandatory" />
+                    <Object SymbolicName="DEVICE:GraspGripperSkill" TypeDefinition="DEVICE:GraspGripperSkillType" ModellingRule="Mandatory" />
+                </Children>
+            </Object>
+            <Object SymbolicName="DEVICE:GripPoints" TypeDefinition="OpcUa:BaseObjectType" ModellingRule="Mandatory">
+                <Children>
+                    <Object SymbolicName="DEVICE:Tip" TypeDefinition="DEVICE:ParallelGripPoint" ModellingRule="Mandatory">
+                        <Children>
+                            <Variable SymbolicName="DEVICE:Range" TypeDefinition="OpcUa:BaseDataVariableType"
+                                      DataType="OpcUa:NumericRange" ModellingRule="Mandatory" ValueRank="Scalar"
+                                      AccessLevel="Read">
+                                <DefaultValue>
+                                    <uax:String>0:85</uax:String>
+                                </DefaultValue>
+                            </Variable>
+                            <Variable SymbolicName="DEVICE:Offset" TypeDefinition="OpcUa:ThreeDFrameType" DataType="OpcUa:ThreeDFrame" ModellingRule="Mandatory">
+                                <DefaultValue>
+                                    <uax:ExtensionObject>
+                                        <uax:TypeId>
+                                            <!-- we can not use OpcUa:ThreeDFrame of the DataType here. The model compiler does not replace it.
+                                            Therefore we need to use the resulting node id -->
+                                            <uax:Identifier>ns=0;i=18814</uax:Identifier>
+                                        </uax:TypeId>
+                                        <uax:Body>
+                                            <ThreeDFrame xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
+                                                <CartesianCoordinates>
+                                                    <X>0</X>
+                                                    <Y>0</Y>
+                                                    <Z>0.2028</Z>
+                                                </CartesianCoordinates>
+                                                <Orientation>
+                                                    <A>0</A>
+                                                    <B>0</B>
+                                                    <C>0</C>
+                                                </Orientation>
+                                            </ThreeDFrame>
+                                        </uax:Body>
+                                    </uax:ExtensionObject>
+                                </DefaultValue>
+                            </Variable>
+                        </Children>
+                    </Object>
+                </Children>
+            </Object>
+        </Children>
+        <References>
+            <Reference IsInverse="false">
+                <ReferenceType>OpcUa:HasInterface</ReferenceType>
+                <TargetId>DEVICE:ISkillControllerType</TargetId>
+            </Reference>
+            <Reference IsInverse="false">
+                <ReferenceType>OpcUa:HasInterface</ReferenceType>
+                <TargetId>DEVICE:IPowerOffDeviceType</TargetId>
+            </Reference>
+            <Reference IsInverse="false">
+                <ReferenceType>OpcUa:HasInterface</ReferenceType>
+                <TargetId>DEVICE:IGripperType</TargetId>
+            </Reference>
+            <Reference IsInverse="true">
+                <ReferenceType>OpcUa:Organizes</ReferenceType>
+                <TargetId>DI:DeviceSet</TargetId>
+            </Reference>
+        </References>
+    </Object>
+
+    <!-- ### Variable Types ###-->
+
+</ModelDesign>

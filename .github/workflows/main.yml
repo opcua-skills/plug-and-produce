@@ -1,0 +1,50 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request 
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies for RL
+      run: sudo apt-add-repository ppa:roblib/ppa && sudo apt update && sudo apt-get install -y --no-install-recommends freeglut3-dev libboost-dev libbullet-dev libbullet-extras-dev libcgal-dev libcurl4-openssl-dev libcoin80-dev libdc1394-22-dev libeigen3-dev freeglut3-dev libgraphviz-dev libnlopt-dev libode-dev libopencv-dev qtbase5-dev libsimage-dev libsoqt4-dev libsolid3d-dev libxml2-dev libxslt1-dev libzip-dev libconfig++-dev libmbedtls-dev
+
+    - name: Install rl
+      run: ./software/semantic-mes/deps/common/tools/install_rl.sh
+    
+    # Install current master
+    - name: Install open62541
+      run: ./software/semantic-mes/deps/common/tools/install_open62541.sh 82611a487d4f2306ddfe6c9037a7686852517bf4 ${{runner.workspace}}/install
+
+    - name: Install cli11
+      run: ./software/semantic-mes/deps/common/tools/install_cli11.sh ${{runner.workspace}}/install
+    
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: cmake $GITHUB_WORKSPACE -DrlDIR=${{runner.workspace}}/install/lib/cmake/rl-0.7.0/ -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{runner.workspace}}/install -DCOMMON_TEST_BUILD=ON
+
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      # Execute the build.  You can specify a specific target with "--target <NAME>"
+      run: cmake --build . --config $BUILD_TYPE --target test_all_headers

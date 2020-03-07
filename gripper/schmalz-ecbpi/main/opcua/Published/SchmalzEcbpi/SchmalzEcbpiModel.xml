@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ModelDesign
+        xmlns:uax="http://opcfoundation.org/UA/2008/02/Types.xsd"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:OpcUa="http://opcfoundation.org/UA/"
+        xmlns:DI="http://opcfoundation.org/UA/DI/"
+        xmlns:DEVICE="https://fortiss.org/UA/Device/"
+        xmlns:SCHMALZ="https://fortiss.org/UA/schmalz/"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        TargetNamespace="https://fortiss.org/UA/schmalz/"
+        TargetXmlNamespace="https://fortiss.org/UA/schmalz/"
+        TargetVersion="0.9.0"
+        TargetPublicationDate="2018-06-24T00:00:00Z"
+        xmlns="http://opcfoundation.org/UA/ModelDesign.xsd">
+
+    <Namespaces>
+        <Namespace Name="schmalz" Prefix="schmalz" XmlNamespace="https://fortiss.org/UA/schmalz/Types.xsd" XmlPrefix="schmalz">https://fortiss.org/UA/schmalz/</Namespace>
+        <Namespace Name="fortissDevice" Prefix="fortiss_Device" XmlNamespace="https://fortiss.org/UA/Device/Types.xsd" XmlPrefix="fortiss_Device" FilePath="../deps/common/deps/robotics_cs/deps/device/fortissDeviceModel">https://fortiss.org/UA/Device/</Namespace>
+        <Namespace Name="OpcUaDi" Prefix="Opc.Ua.Di" XmlNamespace="http://opcfoundation.org/UA/DI/Types.xsd" XmlPrefix="DI" FilePath="OpcUaModel">http://opcfoundation.org/UA/DI/</Namespace>
+        <Namespace Name="OpcUa" Version="1.03" PublicationDate="2013-12-02T00:00:00Z" Prefix="Opc.Ua" InternalPrefix="Opc.Ua.Server" XmlNamespace="http://opcfoundation.org/UA/2008/02/Types.xsd" XmlPrefix="OpcUa">http://opcfoundation.org/UA/</Namespace>
+    </Namespaces>
+
+    <!-- ### Reference Types ###-->
+
+
+    <!-- ### Object Types ###-->
+
+    <ObjectType SymbolicName="SCHMALZ:SchmalzEcbpiType" BaseType="DI:DeviceType" IsAbstract="false">
+    </ObjectType>
+
+    <!-- Sommer automatic gripper Device -->
+    <Object SymbolicName="SCHMALZ:SchmalzEcbpi" TypeDefinition="SCHMALZ:SchmalzEcbpiType" SupportsEvents="true">
+        <Description>Schmalz ECBPi</Description>
+        <Children>
+            <Method SymbolicName="DEVICE:PowerOffDevice" TypeDefinition="DEVICE:PowerOffDeviceMethodType"/>
+            <Object SymbolicName="DEVICE:Skills" TypeDefinition="OpcUa:BaseObjectType" ModellingRule="Mandatory">
+                <Description>Contains the skills of the gripper controller.</Description>
+                <Children>
+                    <!--Object SymbolicName="DEVICE:MoveGripperSkill" TypeDefinition="DEVICE:MoveGripperSkillType" ModellingRule="Optional" /-->
+                    <Object SymbolicName="DEVICE:ReleaseGripperSkill" TypeDefinition="DEVICE:ReleaseGripperSkillType" ModellingRule="Mandatory" />
+                    <Object SymbolicName="DEVICE:GraspGripperSkill" TypeDefinition="DEVICE:GraspGripperSkillType" ModellingRule="Mandatory" />
+                </Children>
+            </Object>
+            <Object SymbolicName="DEVICE:GripPoints" TypeDefinition="OpcUa:BaseObjectType" ModellingRule="Mandatory">
+                <Children>
+                    <Object SymbolicName="DEVICE:VaccumPoint" TypeDefinition="DEVICE:VacuumGripPoint" ModellingRule="Mandatory">
+                        <Children>
+                            <Variable SymbolicName="DEVICE:Offset" TypeDefinition="OpcUa:ThreeDFrameType" DataType="OpcUa:ThreeDFrame" ModellingRule="Mandatory">
+                                <DefaultValue>
+                                    <uax:ExtensionObject>
+                                        <uax:TypeId>
+                                            <!-- we can not use OpcUa:ThreeDFrame of the DataType here. The model compiler does not replace it.
+                                            Therefore we need to use the resulting node id -->
+                                            <uax:Identifier>ns=0;i=18814</uax:Identifier>
+                                        </uax:TypeId>
+                                        <uax:Body>
+                                            <ThreeDFrame xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
+                                                <CartesianCoordinates>
+                                                    <X>0</X>
+                                                    <Y>0</Y>
+                                                    <Z>0.1868</Z>
+                                                </CartesianCoordinates>
+                                                <Orientation>
+                                                    <A>0</A>
+                                                    <B>0</B>
+                                                    <C>0</C>
+                                                </Orientation>
+                                            </ThreeDFrame>
+                                        </uax:Body>
+                                    </uax:ExtensionObject>
+                                </DefaultValue>
+                            </Variable>
+                        </Children>
+                    </Object>
+                </Children>
+            </Object>
+            <Object SymbolicName="SCHMALZ:Status" TypeDefinition="OpcUa:BaseObjectType" ModellingRule="Mandatory">
+                <Description>Status values of the gripper</Description>
+                <Children>
+                    <Variable SymbolicName="SCHMALZ:PartPresent" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:Boolean" ModellingRule="Mandatory">
+                        <Description>Part Present (Vacuum is over H2 and not yet under H2h2)</Description>
+                    </Variable>
+                    <Variable SymbolicName="SCHMALZ:InControlRange" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:Boolean" ModellingRule="Mandatory">
+                        <Description>Equals to Signal H1 if</Description>
+                    </Variable>
+                    <Variable SymbolicName="SCHMALZ:PartDetached" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:Boolean" ModellingRule="Mandatory">
+                        <Description>The part has been detached after a suction cycle</Description>
+                    </Variable>
+                    <Variable SymbolicName="SCHMALZ:VacuumLive" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:UInt16" ModellingRule="Mandatory">
+                        <Description>Current Vaccum Value in mbar resolution</Description>
+                    </Variable>
+                    <Variable SymbolicName="SCHMALZ:TemperatureLive" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:UInt16" ModellingRule="Mandatory">
+                        <Description>Current Temperature (0.1 C resolution)</Description>
+                    </Variable>
+                    <Variable SymbolicName="SCHMALZ:LeakageRate" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:UInt16" ModellingRule="Mandatory">
+                        <Description>Leakage of last suction cycle (unit 1 mbar)</Description>
+                    </Variable>
+                </Children>
+            </Object>
+        </Children>
+        <References>
+            <Reference IsInverse="false">
+                <ReferenceType>OpcUa:HasInterface</ReferenceType>
+                <TargetId>DEVICE:ISkillControllerType</TargetId>
+            </Reference>
+            <Reference IsInverse="false">
+                <ReferenceType>OpcUa:HasInterface</ReferenceType>
+                <TargetId>DEVICE:IPowerOffDeviceType</TargetId>
+            </Reference>
+            <Reference IsInverse="false">
+                <ReferenceType>OpcUa:HasInterface</ReferenceType>
+                <TargetId>DEVICE:IGripperType</TargetId>
+            </Reference>
+            <Reference IsInverse="true">
+                <ReferenceType>OpcUa:Organizes</ReferenceType>
+                <TargetId>DI:DeviceSet</TargetId>
+            </Reference>
+        </References>
+    </Object>
+
+    <!-- ### Variable Types ###-->
+
+</ModelDesign>
