@@ -1,6 +1,14 @@
-# Plug-and-Produce System Architecture for Robotic Applications
+# Plug-and-Produce System Architecture for Robotic Applications using OPC UA
 
-Proof of concept Plug&amp;Produce Architecture for Robot Systems and corresponding System components (Tools, Software, Algorithms)
+Proof of concept Plug&amp;Produce Architecture for Robot Systems and corresponding System components (Tools, Software, Algorithms) using OPC UA
+
+The concept behind this repository and system architecture is presented in the following publication:
+
+
+**A Generic Plug Produce System composed of Semantic OPC UA Skills**.
+Stefan Profanter, Alexander Perzylo, Markus Rickert and Alois Knoll.
+Submitted for review to IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), 2020.
+
 
 Full video is available here: https://www.youtube.com/watch?v=iu85tnm0qfk
 
