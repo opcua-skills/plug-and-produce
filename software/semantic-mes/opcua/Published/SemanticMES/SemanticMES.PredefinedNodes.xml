@@ -65,7 +65,7 @@
         <uax:NumericId>15069</uax:NumericId>
         <uax:Value>
           <uax:Value>
-            <uax:String>http://www.fortiss.org/ont/databackbone/process-1#Process-1</uax:String>
+            <uax:String>http://www.fortiss.org/ont/acra4dt/process-toolchange#Process-ToolChange</uax:String>
           </uax:Value>
         </uax:Value>
         <uax:DataType>
@@ -803,7 +803,7 @@
             <uax:NumericId>15277</uax:NumericId>
             <uax:Value>
               <uax:Value>
-                <uax:String>http://www.fortiss.org/ont/databackbone/process-1#Process-1</uax:String>
+                <uax:String>http://www.fortiss.org/ont/acra4dt/process-toolchange#Process-ToolChange</uax:String>
               </uax:Value>
             </uax:Value>
             <uax:DataType>

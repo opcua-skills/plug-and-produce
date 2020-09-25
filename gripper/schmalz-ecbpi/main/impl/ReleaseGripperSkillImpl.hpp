@@ -1,13 +1,18 @@
-//
-// Created by profanter on 23/07/19.
-// Copyright (c) 2019 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #ifndef ROBOTICS_RELEASERELEASEGRIPPERSKILLIMPL_HPP
 #define ROBOTICS_RELEASERELEASEGRIPPERSKILLIMPL_HPP
 
 
 #include <GripperOPCUA.h>
+
+#include <utility>
 #include "common/opcua/skill/gripper/GraspReleaseGripperSkill.hpp"
 
 namespace fortiss {
@@ -18,14 +23,22 @@ namespace fortiss {
 
         bool isMoving = false;
         std::chrono::steady_clock::time_point skillStartTime;
-        GRIPPER_CLASS *gripper;
+        GRIPPER_CLASS* gripper;
         const std::shared_ptr<spdlog::logger> logger;
+        std::shared_ptr<fortiss::opcua::skill::gripper::GraspReleaseGripperSkill> graspSkill;
+        fortiss::GraspGripperSkillImpl* graspSkillImpl;
 
     public:
-        explicit ReleaseGripperSkillImpl(const std::shared_ptr<spdlog::logger>& logger, GRIPPER_CLASS *gripperControl, bool simulation) :
+        explicit ReleaseGripperSkillImpl(
+                std::shared_ptr<spdlog::logger>  logger,
+                GRIPPER_CLASS* gripperControl,
+                bool simulation,
+                std::shared_ptr<fortiss::opcua::skill::gripper::GraspReleaseGripperSkill>  _graspSkill,
+                fortiss::GraspGripperSkillImpl*  _graspSkillImpl
+        ) :
                 GraspReleaseGripperSkillImpl(),
                 skillStartTime(), gripper(gripperControl),
-                logger(logger) {
+                logger(std::move(logger)), graspSkill(std::move(_graspSkill)), graspSkillImpl(_graspSkillImpl) {
 
         }
 
@@ -40,9 +53,17 @@ namespace fortiss {
             }
 
             logger->info("Got open gripper");
-            isMoving = true;
+            if (graspSkill->getCurrentState()->getNumber() == fortiss::opcua::ProgramStateNumber::RUNNING) {
+                // abort current grasping
+                logger->info("Resetting Grasp Skill as it is still running");
+                if (!graspSkillImpl->haltFromRelease()) {
+                    return false;
+                }
+            }
 
-            gripper->dropOff();
+            if (!gripper->dropOff())
+                return false;
+            isMoving = true;
 
             skillStartTime = std::chrono::steady_clock::now();
             return true;
@@ -52,11 +73,13 @@ namespace fortiss {
             if (!isMoving)
                 return;
 
-            // Todo: We probably do not need this stopVacuum call
-            gripper->stopVaccum();
-            isMoving = false;
-            this->moveFinished();
-            logger->info("Move finished");
+            // Part not grasped after 5 seconds
+            if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - skillStartTime).count() > 500) {
+                isMoving = false;
+                logger->info("Release finished");
+                this->moveFinished();
+            }
+
         }
 
         bool halt() override {

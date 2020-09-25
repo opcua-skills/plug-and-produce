@@ -1,7 +1,10 @@
-//
-// Created by profanter on 12/11/18.
-// Copyright (c) 2018 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #include "UniversalRobotControl.h"
 
@@ -12,7 +15,7 @@
 
 fortiss::robot::UniversalRobotControl::UniversalRobotControl(
         const libconfig::Setting& robotSettings,
-        UA_Server* uaServer
+        const std::shared_ptr<fortiss::opcua::OpcUaServer>& uaServer
 ) :
         fortiss::opcua::robot::RlRobotControl<AXIS_COUNT>(fortiss::log::get("robot/ur"), robotSettings,
                                                           robotSettings["simulation"] ? nullptr :
@@ -67,9 +70,9 @@ bool fortiss::robot::UniversalRobotControl::connect() {
             currentSafetyMode = ur->getSafetyMode();
             currentRuntimeState = ur->getRuntimeState();
 
-            if (ur->getRobotMode() != rl::hal::UniversalRobotsRtde::ROBOT_MODE_RUNNING ||
-                ur->getSafetyMode() != rl::hal::UniversalRobotsRtde::SAFETY_MODE_NORMAL ||
-                ur->getRuntimeState() != rl::hal::UniversalRobotsRtde::RUNTIME_STATE_PLAYING) {
+            if (ur->getRobotMode() != rl::hal::UniversalRobotsRtde::RobotMode::running ||
+                ur->getSafetyMode() != rl::hal::UniversalRobotsRtde::SafetyMode::normal ||
+                ur->getRuntimeState() != rl::hal::UniversalRobotsRtde::RuntimeState::playing) {
                 logger->warn("Robot is not yet ready. Maybe E-Stopped?");
                 return true;
             }
@@ -112,8 +115,8 @@ bool fortiss::robot::UniversalRobotControl::step() {
     rl::math::MotionVector cartSpeed = control->getCartesianVelocity();
     ::rl::math::ForceVector cartForce = control->getCartesianForce();
 
-    UA_Int32 robotMode = control->getRobotMode();
-    UA_Int32 safetyMode = control->getSafetyMode();
+    UA_Int32 robotMode = (int)control->getRobotMode();
+    UA_Int32 safetyMode = (int)control->getSafetyMode();
 
     return
             setVariableDouble(
@@ -127,7 +130,7 @@ bool fortiss::robot::UniversalRobotControl::step() {
             setVariableDouble(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_AXES_AXIS_1_PARAMETERSET_TEMPERATURE),
                     "Axis1_Temperature",
-                    jointCurrent[0]) &&
+                    jointTemperature[0]) &&
             setVariableDouble(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_AXES_AXIS_2_PARAMETERSET_ACTUALSPEED),
                     "Axis2_Speed",
@@ -139,7 +142,7 @@ bool fortiss::robot::UniversalRobotControl::step() {
             setVariableDouble(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_AXES_AXIS_2_PARAMETERSET_TEMPERATURE),
                     "Axis1_Temperature",
-                    jointCurrent[1]) &&
+                    jointTemperature[1]) &&
             setVariableDouble(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_AXES_AXIS_3_PARAMETERSET_ACTUALSPEED),
                     "Axis3_Speed",
@@ -151,7 +154,7 @@ bool fortiss::robot::UniversalRobotControl::step() {
             setVariableDouble(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_AXES_AXIS_3_PARAMETERSET_TEMPERATURE),
                     "Axis3_Temperature",
-                    jointCurrent[2]) &&
+                    jointTemperature[2]) &&
             setVariableDouble(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_AXES_AXIS_4_PARAMETERSET_ACTUALSPEED),
                     "Axis4_Speed",
@@ -163,7 +166,7 @@ bool fortiss::robot::UniversalRobotControl::step() {
             setVariableDouble(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_AXES_AXIS_4_PARAMETERSET_TEMPERATURE),
                     "Axis4_Temperature",
-                    jointCurrent[3]) &&
+                    jointTemperature[3]) &&
             setVariableDouble(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_AXES_AXIS_5_PARAMETERSET_ACTUALSPEED),
                     "Axis5_Speed",
@@ -175,7 +178,7 @@ bool fortiss::robot::UniversalRobotControl::step() {
             setVariableDouble(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_AXES_AXIS_5_PARAMETERSET_TEMPERATURE),
                     "Axis5_Temperature",
-                    jointCurrent[4]) &&
+                    jointTemperature[4]) &&
             setVariableDouble(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_AXES_AXIS_6_PARAMETERSET_ACTUALSPEED),
                     "Axis6_Speed",
@@ -187,32 +190,32 @@ bool fortiss::robot::UniversalRobotControl::step() {
             setVariableDouble(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_AXES_AXIS_6_PARAMETERSET_TEMPERATURE),
                     "Axis6_Temperature",
-                    jointCurrent[5]) &&
+                    jointTemperature[5]) &&
             setVariable3DFrame(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_STATUS_TCPPOSITION),
                     "TcpPosition",
                     cartPosition
-                    ) &&
+            ) &&
             setVariable3DVector(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_STATUS_TCPSPEED),
                     "TcpSpeed",
                     cartSpeed
-                    ) &&
+            ) &&
             setVariable3DVector(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_STATUS_TCPFORCE),
                     "TcpForce",
                     cartForce
-                    ) &&
+            ) &&
             setVariableInt32(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_STATUS_ROBOTMODE),
                     "RobotMode",
                     robotMode
-                    ) &&
+            ) &&
             setVariableInt32(
                     UA_NODEID_NUMERIC(nsIdRobUr, UA_ROB_URID_URMOTIONSYSTEM_MOTIONDEVICES_URROBOT_STATUS_SAFETYMODE),
                     "SafetyMode",
                     safetyMode
-                    );
+            );
 
 }
 
@@ -223,7 +226,8 @@ bool fortiss::robot::UniversalRobotControl::setVariableDouble(
 ) {
     UA_Variant var;
     UA_Variant_setScalar(&var, const_cast<UA_Double*>(&val), &UA_TYPES[UA_TYPES_DOUBLE]);
-    if (const UA_StatusCode retval = UA_Server_writeValue(uaServer, id, var) != UA_STATUSCODE_GOOD) {
+    LockedServer ls = uaServer->getLocked();
+    if (const UA_StatusCode retval = UA_Server_writeValue(ls.get(), id, var) != UA_STATUSCODE_GOOD) {
         logger->error("Cannot write to server variable: {}. Error: {}", name, UA_StatusCode_name(retval));
         return false;
     }
@@ -245,7 +249,8 @@ bool fortiss::robot::UniversalRobotControl::setVariable3DFrame(
     f.orientation.b = vec.y();
     f.orientation.c = vec.z();
     UA_Variant_setScalar(&var, &f, &UA_TYPES[UA_TYPES_THREEDFRAME]);
-    if (const UA_StatusCode retval = UA_Server_writeValue(uaServer, id, var) != UA_STATUSCODE_GOOD) {
+    LockedServer ls = uaServer->getLocked();
+    if (const UA_StatusCode retval = UA_Server_writeValue(ls.get(), id, var) != UA_STATUSCODE_GOOD) {
         logger->error("Cannot write to server variable: {}. Error: {}", name, UA_StatusCode_name(retval));
         return false;
     }
@@ -263,7 +268,8 @@ bool fortiss::robot::UniversalRobotControl::setVariable3DVector(
     v.y = val.angular().y();
     v.z = val.angular().z();
     UA_Variant_setScalar(&var, &v, &UA_TYPES[UA_TYPES_THREEDVECTOR]);
-    if (const UA_StatusCode retval = UA_Server_writeValue(uaServer, id, var) != UA_STATUSCODE_GOOD) {
+    LockedServer ls = uaServer->getLocked();
+    if (const UA_StatusCode retval = UA_Server_writeValue(ls.get(), id, var) != UA_STATUSCODE_GOOD) {
         logger->error("Cannot write to server variable: {}. Error: {}", name, UA_StatusCode_name(retval));
         return false;
     }
@@ -281,7 +287,8 @@ bool fortiss::robot::UniversalRobotControl::setVariable3DVector(
     v.y = val.force().y();
     v.z = val.force().z();
     UA_Variant_setScalar(&var, &v, &UA_TYPES[UA_TYPES_THREEDVECTOR]);
-    if (const UA_StatusCode retval = UA_Server_writeValue(uaServer, id, var) != UA_STATUSCODE_GOOD) {
+    LockedServer ls = uaServer->getLocked();
+    if (const UA_StatusCode retval = UA_Server_writeValue(ls.get(), id, var) != UA_STATUSCODE_GOOD) {
         logger->error("Cannot write to server variable: {}. Error: {}", name, UA_StatusCode_name(retval));
         return false;
     }
@@ -295,7 +302,8 @@ bool fortiss::robot::UniversalRobotControl::setVariableInt32(
 ) {
     UA_Variant var;
     UA_Variant_setScalar(&var, const_cast<UA_Int32*>(&val), &UA_TYPES[UA_TYPES_INT32]);
-    if (const UA_StatusCode retval = UA_Server_writeValue(uaServer, id, var) != UA_STATUSCODE_GOOD) {
+    LockedServer ls = uaServer->getLocked();
+    if (const UA_StatusCode retval = UA_Server_writeValue(ls.get(), id, var) != UA_STATUSCODE_GOOD) {
         logger->error("Cannot write to server variable: {}. Error: {}", name, UA_StatusCode_name(retval));
         return false;
     }

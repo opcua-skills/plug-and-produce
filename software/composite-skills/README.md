@@ -1,13 +1,29 @@
-# Repository template: C++ Component
+# Composite Skills Component
 
-Project template for a C++ Component. Use this as a basis for your new C++ component.
+Component to collect various hierarchically composed skills based on other skills in the system.
+Currently implemented skills:
 
-This project already contains the necessary submodules and CI configuration.
-It also includes an example C++ main file as a starting point.
+- PickAndPlaceSkill: Uses robot move skills and gripper skills to provide a simple Pick & Place skill
 
-## How to use
+## How to build
 
-1. Clone this repository to a new directory
-2. Change the relative path in `.gitmodules` to make sure it matches the final destination of your project
-3. Change the project name in the `CMakeLists.txt`
-4. Push the project to your new repository
+Install all dependencies as given in the Docker Container file:
+
+https://git.fortiss.org/robotics/component/common/-/blob/master/ci/Dockerfile
+
+Then build:
+
+```bash
+mkdir build
+cd build
+cmake ..
+make -j
+```
+
+## How to run
+
+Make sure to change `/path/to/repo` in the following command to the full path of this repo.
+
+```
+./composite-skills --config=/path/to/repo/component.cfg --certs-client=/path/to/repo/certs/client/$(hostname) --certs-server=/path/to/repo/certs/server/$(hostname)
+```

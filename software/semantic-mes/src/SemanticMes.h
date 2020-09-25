@@ -1,6 +1,10 @@
-//
-// Created by pangercic on 1/8/19.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #ifndef DATA_BACKBONE_SEMANTICMES_H
 #define DATA_BACKBONE_SEMANTICMES_H
@@ -16,14 +20,16 @@
 #include "ExecuteProcessSkillImpl.h"
 
 #include <common/skill_detector/SkillDetector.h>
+#include <set>
 
 
 class SemanticMes {
 
 public:
     explicit SemanticMes(
-            std::shared_ptr<spdlog::logger> _logger,
-            UA_Server* server,
+            std::shared_ptr<spdlog::logger> _loggerApp,
+            std::shared_ptr<spdlog::logger> _loggerOpcua,
+            const std::shared_ptr<fortiss::opcua::OpcUaServer>& server,
             const std::string& clientCertPath,
             const std::string& clientKeyPath
     );
@@ -37,11 +43,12 @@ public:
             const std::string& executionMode
     );
 
+
     void start();
 
     void stop();
 
-    void onRegisterServer(const UA_RegisteredServer* registeredServer);
+    void onServerRegister(const UA_RegisteredServer* registeredServer);
 
     void onServerAnnounce(
             const UA_ServerOnNetwork* serverOnNetwork,
@@ -50,23 +57,24 @@ public:
 
 protected:
     virtual bool createNodesFromNodeset();
+
     std::shared_ptr<spdlog::logger> logger;
-    UA_Server* server;
+    std::shared_ptr<spdlog::logger> loggerOpcua;
+    const std::shared_ptr<fortiss::opcua::OpcUaServer> server;
+
     virtual UA_StatusCode initSkills();
 
     SkillDetector* skillDetector = nullptr;
 
 
+    UA_StatusCode triggerModelChangeEvent(UA_NodeId nodeId);
+
 private:
     bool running = false;
 
-    bool isExecuting = false;
 
     fortiss::semantic_mes::ExecuteProcessSkillImpl* executeProcessSkillImpl{};
     std::unique_ptr<fortiss::opcua::skill::ExecuteProcessSkill> executeProcessSkill;
-
-    std::map<std::string, bool> serverKnown;
-
 
 };
 

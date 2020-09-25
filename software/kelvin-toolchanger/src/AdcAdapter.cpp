@@ -1,7 +1,10 @@
-//
-// Created by profanter on 19/12/2019.
-// Copyright (c) 2019 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #include "AdcAdapter.h"
 
@@ -96,12 +99,18 @@ UA_StatusCode AdcAdapter::connect(const std::string& endpoint, const std::string
 }
 
 void AdcAdapter::disconnect() {
+
+    if (setVoltageThread.joinable())
+        // wait for previous thread exec to finish
+        setVoltageThread.join();
+
     if (client == nullptr)
         return;
 
     if (!running)
         return;
     running = false;
+
     stepperThread.join();
 
     UA_Client_disconnect(client);
@@ -112,7 +121,12 @@ void AdcAdapter::disconnect() {
 
 void AdcAdapter::threadWorker() {
     while (running) {
-        if (UA_Client_getState(client) == UA_CLIENTSTATE_DISCONNECTED) {
+        UA_SecureChannelState channelState;
+        UA_SessionState sessionState;
+        UA_StatusCode connectStatus;
+        UA_Client_getState(client, &channelState, &sessionState, &connectStatus);
+
+        if (channelState == UA_SECURECHANNELSTATE_CLOSED || sessionState == UA_SESSIONSTATE_CLOSED) {
             logger->warn("ADC Client reconnecting...");
             UA_StatusCode retVal = connectClient();
             if (retVal != UA_STATUSCODE_GOOD) {
@@ -156,12 +170,19 @@ void AdcAdapter::threadWorker() {
 }
 
 UA_StatusCode AdcAdapter::connectClient() {
-    if (UA_Client_getState(client) >= UA_CLIENTSTATE_SESSION) {
+
+    UA_SecureChannelState channelState;
+    UA_SessionState sessionState;
+    UA_StatusCode connectStatus;
+    UA_Client_getState(client, &channelState, &sessionState, &connectStatus);
+    if (sessionState >= UA_SESSIONSTATE_ACTIVATED) {
         UA_Client_run_iterate(client, 1);
-        if (UA_Client_getState(client) >= UA_CLIENTSTATE_SESSION) {
+        UA_Client_getState(client, &channelState, &sessionState, &connectStatus);
+        if (sessionState >= UA_SESSIONSTATE_ACTIVATED) {
             return UA_STATUSCODE_GOOD;
         }
     }
+
     UA_Client_disconnect(client);
 
     UA_StatusCode retval;
@@ -307,7 +328,10 @@ bool AdcAdapter::setStateSimulated(const KelvinToolState newState, const short n
     if (!isSimulation)
         return false;
     // run in different thread to simulate same behaviour as for client subscription
-    std::thread setVoltageThread = std::thread([&, newState, newId] {
+    if (setVoltageThread.joinable())
+        // wait for previous thread exec to finish
+        setVoltageThread.join();
+    setVoltageThread = std::thread([&, newState, newId] {
         if (newId != this->toolId || toolState != newState) {
             logger->info("Tool changed:\n\tState: {} -> {}\n\tId: {} -> {}", this->toolState, newState, this->toolId, newId);
             this->toolId = newId;
@@ -316,6 +340,5 @@ bool AdcAdapter::setStateSimulated(const KelvinToolState newState, const short n
                 this->toolChangeCallback(newState, newId);
         }
     });
-    setVoltageThread.detach();
     return true;
 }

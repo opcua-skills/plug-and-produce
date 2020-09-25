@@ -38,8 +38,29 @@
                 <Description>Contains the skills of the gripper controller.</Description>
                 <Children>
                     <!--Object SymbolicName="DEVICE:MoveGripperSkill" TypeDefinition="DEVICE:MoveGripperSkillType" ModellingRule="Optional" /-->
-                    <Object SymbolicName="DEVICE:ReleaseGripperSkill" TypeDefinition="DEVICE:ReleaseGripperSkillType" ModellingRule="Mandatory" />
-                    <Object SymbolicName="DEVICE:GraspGripperSkill" TypeDefinition="DEVICE:GraspGripperSkillType" ModellingRule="Mandatory" />
+                    <Object SymbolicName="DEVICE:ReleaseGripperSkill" TypeDefinition="DEVICE:ReleaseGripperSkillType" ModellingRule="Mandatory"
+                            SupportsEvents="true" />
+                    <Object SymbolicName="DEVICE:GraspGripperSkill" TypeDefinition="DEVICE:GraspGripperSkillType" ModellingRule="Mandatory"
+                            SupportsEvents="true" />
+                    <Object SymbolicName="DEVICE:MoveGripperSkill" TypeDefinition="DEVICE:MoveGripperSkillType" ModellingRule="Mandatory"
+                            SupportsEvents="true">
+                        <Children>
+                            <Object SymbolicName="DI:ParameterSet" ModellingRule="Mandatory">
+                                <Children>
+                                    <Variable SymbolicName="DEVICE:Width" TypeDefinition="OpcUa:AnalogItemType" DataType="OpcUa:Double" ModellingRule="Mandatory" ValueRank="Scalar" AccessLevel="ReadWrite">
+                                        <DefaultValue>
+                                            <uax:Double>0.01</uax:Double>
+                                        </DefaultValue>
+                                    </Variable>
+                                    <Variable SymbolicName="DEVICE:Force" TypeDefinition="OpcUa:AnalogItemType" DataType="OpcUa:Double" ModellingRule="Optional" ValueRank="Scalar" AccessLevel="ReadWrite">
+                                        <DefaultValue>
+                                            <uax:Double>10</uax:Double>
+                                        </DefaultValue>
+                                    </Variable>
+                                </Children>
+                            </Object>
+                        </Children>
+                    </Object>
                 </Children>
             </Object>
             <Object SymbolicName="DEVICE:GripPoints" TypeDefinition="OpcUa:BaseObjectType" ModellingRule="Mandatory">

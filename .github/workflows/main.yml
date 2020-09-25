@@ -34,11 +34,11 @@ jobs:
       run: sudo apt-add-repository ppa:roblib/ppa && sudo apt update && sudo apt-get install -y --no-install-recommends freeglut3-dev libboost-dev libbullet-dev libbullet-extras-dev libcgal-dev libcurl4-openssl-dev libcoin80-dev libdc1394-22-dev libeigen3-dev freeglut3-dev libgraphviz-dev libnlopt-dev libode-dev libopencv-dev qtbase5-dev libsimage-dev libsoqt4-dev libsolid3d-dev libxml2-dev libxslt1-dev libzip-dev libconfig++-dev libmbedtls-dev python-netifaces
 
     - name: Install rl
-      run: ./software/semantic-mes/deps/common/tools/install_rl.sh 35dc4a37de4f180da8b0422c8e64e25f2bc94c51
+      run: ./software/semantic-mes/deps/common/tools/install_rl.sh cba76ed3e54676d430205a0dfdf03ce33ed3850c
     
     # Install current master
     - name: Install open62541
-      run: ./software/semantic-mes/deps/common/tools/install_open62541.sh 82611a487d4f2306ddfe6c9037a7686852517bf4 ${{runner.workspace}}/install
+      run: ./software/semantic-mes/deps/common/tools/install_open62541.sh dac2c98d3b9722fb1971780d34996ea64bf65445 ${{runner.workspace}}/install
 
     - name: Install cli11
       run: ./software/semantic-mes/deps/common/tools/install_cli11.sh ${{runner.workspace}}/install
@@ -49,7 +49,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: cmake $GITHUB_WORKSPACE -DrlDIR=${{runner.workspace}}/install/lib/cmake/rl-0.7.0/ -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{runner.workspace}}/install
+      run: export CXX="g++-8" CC="gcc-8" && cmake $GITHUB_WORKSPACE -DrlDIR=${{runner.workspace}}/install/lib/cmake/rl-0.7.0/ -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{runner.workspace}}/install
 
     - name: Build
       working-directory: ${{runner.workspace}}/build

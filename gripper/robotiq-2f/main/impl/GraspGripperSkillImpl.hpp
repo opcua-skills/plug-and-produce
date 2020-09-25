@@ -1,7 +1,10 @@
-//
-// Created by profanter on 23/07/19.
-// Copyright (c) 2019 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #ifndef ROBOTICS_GRASPRELEASEGRIPPERSKILLIMPL_HPP
 #define ROBOTICS_GRASPRELEASEGRIPPERSKILLIMPL_HPP
@@ -43,7 +46,7 @@ namespace fortiss {
                 return false;
             }
 
-            logger->info("Got close gripper");
+            logger->info("Got grasp gripper");
             isMoving = true;
 
             gripper->setForcePercentage(static_cast<rl::math::Real>(0.1));
@@ -65,8 +68,8 @@ namespace fortiss {
                 logger->info("Move finished");
             }
             #else
-            // Simulate get part after 2 seconds
-            if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - skillStartTime).count() > 2) {
+            // Simulate get part after 1 seconds
+            if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - skillStartTime).count() > 1) {
                 isMoving = false;
                 this->moveFinished();
                 logger->info("Got part");

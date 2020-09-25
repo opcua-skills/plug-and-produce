@@ -1,32 +1,45 @@
-//
-// Created by profanter on 13/01/2020.
-// Copyright (c) 2020 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #include "PnpSemanticMes.h"
 
 #include <utility>
+#include <types_fortiss_device_generated.h>
+#include <di_nodeids.h>
+#include <open62541/client_highlevel.h>
+#include <common/skill_detector/SkillHelper.hpp>
+#include <rl/math/Constants.h>
 
+// For Empress Video speed factor was 25.0
+#define SPEED_FACTOR 25
 
 PnpSemanticMes::PnpSemanticMes(
         std::shared_ptr<spdlog::logger> _logger,
-        UA_Server* server,
+        std::shared_ptr<spdlog::logger> _loggerOpcua,
+        const std::shared_ptr<fortiss::opcua::OpcUaServer>& server,
         const std::string& clientCertPath,
         const std::string& clientKeyPath,
-        const libconfig::Setting& pnpSetting
+        const libconfig::Setting& pnpSetting,
+        bool _isSimulation
 ) :
-        SemanticMes(std::move(_logger), server, clientCertPath, clientKeyPath),
-        pnpSetting(pnpSetting) {
-
+        SemanticMes(std::move(_logger), std::move(_loggerOpcua), server, clientCertPath, clientKeyPath),
+        pnpSetting(pnpSetting),
+        isSimulation(_isSimulation) {
+    if (isSimulation) {
+        logger->info("Starting sMES in Simulation");
+    }
 }
 
-PnpSemanticMes::~PnpSemanticMes() {
-
-}
+PnpSemanticMes::~PnpSemanticMes() = default;
 
 UA_StatusCode PnpSemanticMes::startExecution(
-        const std::string& abstractProcessIri,
-        const std::string& executionMode
+            const std::string& abstractProcessIri,
+            const std::string& executionMode
 ) {
     return startDemoExecution();
 }
@@ -175,7 +188,7 @@ UA_StatusCode PnpSemanticMes::takeToolAtPosition(
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     bool success = false;
     try {
-        success = toolchangerSkill->execute(logger, skillParameters).get();
+        success = toolchangerSkill->execute(logger, loggerOpcua, skillParameters).get();
         if (!success) {
             logger->warn("Skill execution returned false. Probably there was an issue while running.");
         }
@@ -227,7 +240,7 @@ UA_StatusCode PnpSemanticMes::dropCurrentTool() {
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     bool success = false;
     try {
-        success = dropSkill->execute(logger, skillParameters).get();
+        success = dropSkill->execute(logger, loggerOpcua, skillParameters).get();
         if (!success) {
             logger->warn("Skill execution returned false. Probably there was an issue while running.");
         }
@@ -273,7 +286,7 @@ UA_StatusCode PnpSemanticMes::demoPickPart(
     {
         std::vector<std::shared_ptr<RegisteredComponent>> comp;
         // wait a bit after toolchange to allow new connected tool to register itself
-        for (size_t i=0; i<10 && comp.empty(); i++) {
+        for (size_t i = 0; i < 10 && comp.empty(); i++) {
             comp = this->skillDetector->getComponentForAppUri(toolUri);
             if (comp.empty())
                 std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -471,7 +484,7 @@ PnpSemanticMes::pickAndPlaceObject(
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     bool success = false;
     try {
-        success = pickAndPlaceSkill->execute(logger, skillParameters).get();
+        success = pickAndPlaceSkill->execute(logger, loggerOpcua, skillParameters).get();
         if (!success) {
             logger->warn("Skill execution returned false. Probably there was an issue while running.");
         }

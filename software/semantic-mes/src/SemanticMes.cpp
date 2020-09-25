@@ -1,7 +1,10 @@
-//
-// Created by pangercic on 1/8/19.
-//
-
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #include "SemanticMes.h"
 // next include need to be here because of forward declaration
@@ -21,14 +24,16 @@
 #include <utility>
 
 SemanticMes::SemanticMes(
-        std::shared_ptr<spdlog::logger> _logger,
-        UA_Server* server,
+        std::shared_ptr<spdlog::logger> _loggerApp,
+        std::shared_ptr<spdlog::logger> _loggerOpcua,
+        const std::shared_ptr<fortiss::opcua::OpcUaServer>& server,
         const std::string& clientCertPath,
         const std::string& clientKeyPath
 ) :
-        logger(std::move(_logger)),
+        logger(std::move(_loggerApp)),
+        loggerOpcua(std::move(_loggerOpcua)),
         server(server),
-        skillDetector(new SkillDetector(logger, clientCertPath, clientKeyPath, "fortiss.component.mes.client",
+        skillDetector(new SkillDetector(logger, loggerOpcua, clientCertPath, clientKeyPath, "fortiss.component.mes.client",
                                         "fortiss - MES - Skill Client")) {
 
     if (!this->createNodesFromNodeset()) {
@@ -48,15 +53,16 @@ SemanticMes::~SemanticMes() {
 }
 
 bool SemanticMes::createNodesFromNodeset() {
-    if (namespace_di_generated(server) != UA_STATUSCODE_GOOD) {
+    LockedServer ls = server->getLocked();
+    if (namespace_di_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the DI namespace failed. Please check previous error output.");
         return false;
     }
-    if (namespace_fortiss_device_generated(server) != UA_STATUSCODE_GOOD) {
+    if (namespace_fortiss_device_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the fortiss device namespace failed. Please check previous error output.");
         return false;
     }
-    if (namespace_semantic_mes_generated(server) != UA_STATUSCODE_GOOD) {
+    if (namespace_semantic_mes_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the Semantic MES namespace failed. Please check previous error output.");
         return false;
     }
@@ -83,7 +89,6 @@ UA_StatusCode SemanticMes::startExecution(
         const std::string& executionMode
 ) {
     return UA_STATUSCODE_BADNOTIMPLEMENTED;
-
 }
 
 UA_StatusCode SemanticMes::initSkills() {
@@ -107,53 +112,8 @@ UA_StatusCode SemanticMes::initSkills() {
     return UA_STATUSCODE_GOOD;
 }
 
-void SemanticMes::onRegisterServer(const UA_RegisteredServer* registeredServer) {
-
-    std::string serverUri = std::string((char*) registeredServer->serverUri.data, registeredServer->serverUri.length);
-
-    // create a copy of registered server struct since it may be deleted while the thread is still running.
-    UA_RegisteredServer* registeredServerTmp = UA_RegisteredServer_new();
-    UA_RegisteredServer_copy(registeredServer, registeredServerTmp);
-    std::shared_ptr<UA_RegisteredServer> registeredServerSafe = std::shared_ptr<UA_RegisteredServer>(registeredServerTmp, [=](UA_RegisteredServer* ptr) {
-        UA_RegisteredServer_delete(ptr);
-    });
-
-    if (registeredServer->isOnline) {
-        logger->info("Got register from component: {}", serverUri);
-
-        std::vector<std::string> discoveryUrls;
-
-        for (size_t i = 0; i < registeredServer->discoveryUrlsSize; i++) {
-            discoveryUrls.emplace_back(std::string((char*) registeredServer->discoveryUrls[i].data, registeredServer->discoveryUrls[i].length));
-        }
-
-        std::thread([this, registeredServerSafe, discoveryUrls]() {
-
-            std::shared_ptr<spdlog::logger> loggerClient = logger->clone(logger->name() + "-client");
-            if (loggerClient->level() < spdlog::level::err)
-                loggerClient->set_level(spdlog::level::err);
-
-            std::promise<std::shared_ptr<UA_EndpointDescription>> promiseEndpoint;
-            fortiss::opcua::getBestEndpointFromServer(discoveryUrls, promiseEndpoint, loggerClient);
-            std::future<std::shared_ptr<UA_EndpointDescription>> endpointFuture = promiseEndpoint.get_future();
-
-            std::future_status status = endpointFuture.wait_for(std::chrono::seconds(5));
-
-            if (status == std::future_status::ready) {
-                std::shared_ptr<UA_EndpointDescription> endpoint = endpointFuture.get();
-                skillDetector->componentConnected(registeredServerSafe, endpoint);
-            }
-
-        }).detach();
-
-    } else {
-
-        logger->info("Got unregister from component: {}", serverUri);
-
-        skillDetector->componentDisconnected(registeredServerSafe);
-    }
-
-
+void SemanticMes::onServerRegister(const UA_RegisteredServer* registeredServer) {
+    skillDetector->onServerRegister(registeredServer);
 }
 
 
@@ -161,60 +121,48 @@ void SemanticMes::onServerAnnounce(
         const UA_ServerOnNetwork* serverOnNetwork,
         UA_Boolean isServerAnnounce
 ) {
-
-    std::string serverName = std::string((char*) serverOnNetwork->serverName.data, serverOnNetwork->serverName.length);
-
-    // create a copy of registered server struct since it may be deleted while the thread is still running.
-    UA_ServerOnNetwork* serverOnNetworkTemp = UA_ServerOnNetwork_new();
-    UA_ServerOnNetwork_copy(serverOnNetwork, serverOnNetworkTemp);
-    std::shared_ptr<UA_ServerOnNetwork> serverOnNetworkSafe = std::shared_ptr<UA_ServerOnNetwork>(serverOnNetworkTemp, [=](UA_ServerOnNetwork* ptr) {
-        UA_ServerOnNetwork_delete(ptr);
-    });
-
-    if (isServerAnnounce) {
-
-        std::vector<std::string> discoveryUrls;
-
-        std::string discoveryUrl = std::string((char*) serverOnNetwork->discoveryUrl.data, serverOnNetwork->discoveryUrl.length);
-
-        if (serverKnown.count(discoveryUrl) > 0)
-            return;
-
-        logger->info("Got register from component: {}", serverName);
-
-        discoveryUrls.emplace_back(discoveryUrl);
-        serverKnown.emplace(discoveryUrl, true);
-
-        std::thread([this, serverOnNetworkSafe, discoveryUrls]() {
-
-            std::shared_ptr<spdlog::logger> loggerClient = logger->clone(logger->name() + "-client");
-            if (loggerClient->level() < spdlog::level::err)
-                loggerClient->set_level(spdlog::level::err);
-
-            std::promise<std::shared_ptr<UA_EndpointDescription>> promiseEndpoint;
-            fortiss::opcua::getBestEndpointFromServer(discoveryUrls, promiseEndpoint, loggerClient);
-            std::future<std::shared_ptr<UA_EndpointDescription>> endpointFuture = promiseEndpoint.get_future();
-
-            std::future_status status = endpointFuture.wait_for(std::chrono::seconds(5));
-
-            if (status == std::future_status::ready) {
-                std::shared_ptr<UA_EndpointDescription> endpoint = endpointFuture.get();
-                skillDetector->componentConnected(serverOnNetworkSafe, endpoint);
-            }
-
-        }).detach();
-
-    } else {
+    skillDetector->onServerAnnounce(serverOnNetwork, isServerAnnounce);
+}
 
 
-        std::string discoveryUrl = std::string((char*) serverOnNetwork->discoveryUrl.data, serverOnNetwork->discoveryUrl.length);
-        if (serverKnown.count(discoveryUrl) == 0)
-            return;
+UA_StatusCode SemanticMes::triggerModelChangeEvent(UA_NodeId nodeId) {
+    UA_NodeId eventId;
 
-        logger->info("Got unregister from component: {}", serverName);
-        serverKnown.erase(discoveryUrl);
-        skillDetector->componentDisconnected(serverOnNetworkSafe);
+    LockedServer ls = server->getLocked();
+
+    UA_StatusCode retval = UA_Server_createEvent(ls.get(), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEMODELCHANGEEVENTTYPE), &eventId);
+    if (retval != UA_STATUSCODE_GOOD) {
+        logger->error("createEvent failed: {}", UA_StatusCode_name(retval));
+        return retval;
     }
 
+    /* Set the Event Attributes */
+    /* Setting the Time is required or else the event will not show up in UAExpert! */
+    UA_DateTime eventTime = UA_DateTime_now();
+    UA_Server_writeObjectProperty_scalar(ls.get(),
+                                         eventId,
+                                         UA_QUALIFIEDNAME(0, const_cast<char*>("Time")),
+                                         &eventTime,
+                                         &UA_TYPES[UA_TYPES_DATETIME]);
+
+    UA_UInt16 eventSeverity = 100;
+    UA_Server_writeObjectProperty_scalar(ls.get(),
+                                         eventId,
+                                         UA_QUALIFIEDNAME(0, const_cast<char*>("Severity")),
+                                         &eventSeverity,
+                                         &UA_TYPES[UA_TYPES_UINT16]);
+
+    UA_LocalizedText eventMessage = UA_LOCALIZEDTEXT(const_cast<char*>("en-US"),
+                                                     const_cast<char*>("The model changed"));
+    UA_Server_writeObjectProperty_scalar(ls.get(),
+                                         eventId,
+                                         UA_QUALIFIEDNAME(0, const_cast<char*>("Message")),
+                                         &eventMessage,
+                                         &UA_TYPES[UA_TYPES_LOCALIZEDTEXT]);
+
+    return UA_Server_triggerEvent(ls.get(),
+                                  eventId,
+                                  nodeId,
+                                  NULL, UA_TRUE);
 
 }

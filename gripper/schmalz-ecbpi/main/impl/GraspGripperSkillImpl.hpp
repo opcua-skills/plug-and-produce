@@ -1,7 +1,10 @@
-//
-// Created by profanter on 23/07/19.
-// Copyright (c) 2019 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #ifndef ROBOTICS_GRASPRELEASEGRIPPERSKILLIMPL_HPP
 #define ROBOTICS_GRASPRELEASEGRIPPERSKILLIMPL_HPP
@@ -42,7 +45,8 @@ namespace fortiss {
             logger->info("Got grasp gripper");
             isMoving = true;
 
-            gripper->startVaccum();
+            if (!gripper->startVaccum())
+                return false;
 
 
             skillStartTime = std::chrono::steady_clock::now();
@@ -58,10 +62,20 @@ namespace fortiss {
             if (!gripper->getProcessDataIn(&processDataIn)) {
                 logger->error("Could not read process data of gripper");
                 this->moveErrored();
+                if (!gripper->stopVaccum())
+                    return;
             } else if (processDataIn->partPresent) {
                 isMoving = false;
                 this->moveFinished();
                 logger->info("Got part");
+            }
+
+            // Part not grasped after a few seconds
+            if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - skillStartTime).count() > 8) {
+                isMoving = false;
+                gripper->stopVaccum();
+                this->moveErrored();
+                logger->info("Part not present. Grasp error.");
             }
             #else
             // Simulate get part after 2 seconds
@@ -78,18 +92,23 @@ namespace fortiss {
             if (isMoving) {
                 gripper->stopVaccum();
                 isMoving = false;
-                this->moveFinished();
-                logger->info("Got reset");
+                logger->info("Got halt");
                 return true;
             }
             return false;
         };
 
+        bool haltFromRelease() {
+            moveErrored();
+            isMoving = false;
+            logger->info("Got halt from release");
+            return true;
+        }
+
         bool resume() override {
             if (!isMoving) {
                 isMoving = true;
-                gripper->startVaccum();
-                return true;
+                return gripper->startVaccum();
             }
             return false;
 
@@ -99,8 +118,7 @@ namespace fortiss {
             if (isMoving) {
                 gripper->stopVaccum();
                 isMoving = false;
-                this->moveFinished();
-                logger->info("Got reset");
+                logger->info("Got suspend");
                 return true;
             }
             return false;
@@ -108,15 +126,10 @@ namespace fortiss {
         };
 
         bool reset() override {
-            if (isMoving) {
-                gripper->stopVaccum();
-                isMoving = false;
-                this->moveFinished();
-                logger->info("Got reset");
-                return true;
-            }
-            return false;
-
+            gripper->stopVaccum();
+            isMoving = false;
+            logger->info("Got reset");
+            return true;
         };
 
     };

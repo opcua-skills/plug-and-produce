@@ -30,7 +30,7 @@ $<TARGET_FILE:composite-skills> --config ${CMAKE_CURRENT_LIST_DIR}/configs/compo
 P_composite=$!
 
 echo "Starting Semantic MES component ..."
-$<TARGET_FILE:semantic-mes> --config ${CMAKE_CURRENT_LIST_DIR}/configs/semantic-mes.cfg --certs-server=${CMAKE_CURRENT_LIST_DIR}/software/semantic-mes/certs/server/${HOSTNAME} --certs-client=${CMAKE_CURRENT_LIST_DIR}/software/semantic-mes/certs/client/${HOSTNAME} &
+$<TARGET_FILE:semantic-mes> --config ${CMAKE_CURRENT_LIST_DIR}/configs/semantic-mes-sim.cfg --certs-server=${CMAKE_CURRENT_LIST_DIR}/software/semantic-mes/certs/server/${HOSTNAME} --certs-client=${CMAKE_CURRENT_LIST_DIR}/software/semantic-mes/certs/client/${HOSTNAME} &
 P_mes=$!
 
 # After the trapped SIGINT interrupts wait, remove the trap and then wait for the background jobs to finish shutting down.

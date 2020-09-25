@@ -21,9 +21,8 @@ SchmalzEcbpi_Status,15020,Object
 SchmalzEcbpi_Status_PartPresent,15021,Variable
 SchmalzEcbpi_Status_PartDetached,15022,Variable
 SchmalzEcbpi_Status_VacuumLive,15023,Variable
-SchmalzEcbpi_Status_TemperatureLive,15024,Variable
 SchmalzEcbpi_Status_InControlRange,15025,Variable
-SchmalzEcbpi_Status_LeakageRate,15026,Variable
+SchmalzEcbpi_Status_ActualPower,15029,Variable
 SchmalzEcbpiType,15230,ObjectType
 SchmalzEcbpiType_ParameterSet,15231,Object
 SchmalzEcbpiType_ParameterSet_ParameterIdentifier,15232,Variable

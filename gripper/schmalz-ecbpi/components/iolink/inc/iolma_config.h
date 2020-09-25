@@ -53,7 +53,7 @@ extern "C"
  * @note If IOLMA_PLATFORM_EMBEDDED is defined, it means the IOLMA will be used on an embedded environment
  * @note If IOLMA_PLATFORM_EMBEDDED is not defined, it means the IOLMA will be used on a desktop environment
  * */
-// #define IOLMA_PLATFORM_EMBEDDED
+#define IOLMA_PLATFORM_EMBEDDED
 
 /* #undef IOLMA_HAS_USB */
 

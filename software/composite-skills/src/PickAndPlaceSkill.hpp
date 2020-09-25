@@ -1,7 +1,10 @@
-//
-// Created by profanter on 17/12/2019.
-// Copyright (c) 2019 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #ifndef COMPOSITE_SKILLS_PICKANDPLACESKILL_HPP
 #define COMPOSITE_SKILLS_PICKANDPLACESKILL_HPP
@@ -44,6 +47,8 @@ namespace fortiss {
 
                 std::function<void()> finished;
                 std::function<void()> errored;
+                std::function<UA_StatusCode(const std::string&)> setStep;
+
             };
 
             class PickAndPlaceSkill : virtual public SkillBase {
@@ -54,6 +59,7 @@ namespace fortiss {
                 const size_t nsCompositeSkillsId;
 
                 const std::shared_ptr<UA_NodeId> parameterSetNodeId;
+                const std::shared_ptr<UA_NodeId> skillStepNodeId;
 
                 SkillParameter<std::string> objectId;
                 SkillParameter<std::string> toolControllerEndpoint;
@@ -103,7 +109,7 @@ namespace fortiss {
             public:
 
                 explicit PickAndPlaceSkill(
-                        UA_Server* server,
+                        const std::shared_ptr<fortiss::opcua::OpcUaServer>& server,
                         std::shared_ptr<spdlog::logger>& logger,
                         const UA_NodeId& skillNodeId,
                         const std::string& eventSourceName
@@ -114,6 +120,9 @@ namespace fortiss {
                         parameterSetNodeId(UA_Server_getObjectComponentId(server, skillNodeId,
                                                                           UA_QUALIFIEDNAME(static_cast<UA_UInt16>(nsDiIdx),
                                                                                            const_cast<char*>("ParameterSet")))),
+                        skillStepNodeId(UA_Server_getObjectComponentId(server, skillNodeId,
+                                                                          UA_QUALIFIEDNAME(static_cast<UA_UInt16>(nsCompositeSkillsId),
+                                                                                           const_cast<char*>("SkillStep")))),
                         objectId(&UA_TYPES[UA_TYPES_STRING], "ObjectId",
                                  UA_Server_getObjectComponentId(server, *parameterSetNodeId,
                                                                 UA_QUALIFIEDNAME(static_cast<UA_UInt16>(nsCompositeSkillsId),
@@ -133,9 +142,11 @@ namespace fortiss {
                     // use dynamic cast to make sure polymorphic resolution is correct
                     auto selfProgram = dynamic_cast<Program*>(this);
 
-                    if (UA_Server_setNodeContext(server, skillNodeId, selfProgram) != UA_STATUSCODE_GOOD) {
+                    LockedServer ls = server->getLocked();
+                    if (UA_Server_setNodeContext(ls.get(), skillNodeId, selfProgram) != UA_STATUSCODE_GOOD) {
                         throw std::runtime_error("Adding method context failed");
                     }
+                    setStep("Idle");
                 }
 
                 void finished() {
@@ -148,6 +159,22 @@ namespace fortiss {
                     if (!transition(ProgramStateNumber::HALTED)) {
                         logger->error("Failed to make transition after tool change has failed to halted");
                     }
+                }
+
+
+                UA_StatusCode setStep(const std::string& step) {
+                    UA_Variant stepVar;
+                    UA_String stepStr = UA_STRING(const_cast<char*>(step.c_str()));
+                    UA_Variant_setScalar(&stepVar, &stepStr, &UA_TYPES[UA_TYPES_STRING]);
+                    UA_StatusCode retval;
+                    {
+                        LockedServer ls = server->getLocked();
+                        retval = UA_Server_writeValue(ls.get(), *skillStepNodeId.get(), stepVar);
+                    }
+                    if (retval != UA_STATUSCODE_GOOD) {
+                        logger->error("Could not set SkillStep variable: {}", UA_StatusCode_name(retval));
+                    }
+                    return retval;
                 }
 
                 virtual void setImpl(
@@ -177,6 +204,8 @@ namespace fortiss {
                             &PickAndPlaceSkill::finished, this);
                     impl->errored = std::bind(
                             &PickAndPlaceSkill::errored, this);
+                    impl->setStep = std::bind(
+                            &PickAndPlaceSkill::setStep, this, std::placeholders::_1);
                 }
 
             };

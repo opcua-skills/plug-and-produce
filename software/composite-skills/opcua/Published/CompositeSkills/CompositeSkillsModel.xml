@@ -33,6 +33,11 @@
     <BrowseName>PickAndPlaceSkill</BrowseName>
     <Description>Pick and Place skill</Description>
     <Children>
+      <Variable SymbolicName="COMPOSITE_SKILLS:SkillStep" TypeDefinition="OpcUa:BaseDataVariableType"
+                DataType="OpcUa:String" ModellingRule="Mandatory" ValueRank="Scalar"
+                AccessLevel="Read">
+        <Description>The current executed step represented as string. I.e., Pick-Approach, Pick-Up, Move-Place, ...</Description>
+      </Variable>
       <Object SymbolicName="DI:ParameterSet" ModellingRule="Mandatory">
         <Children>
           <Variable SymbolicName="COMPOSITE_SKILLS:ObjectId" TypeDefinition="OpcUa:BaseDataVariableType"
@@ -70,7 +75,8 @@
       <Object SymbolicName="DEVICE:Skills" TypeDefinition="OpcUa:BaseObjectType" ModellingRule="Mandatory">
         <Description>Contains the skills of the semantic MES</Description>
         <Children>
-          <Object SymbolicName="COMPOSITE_SKILLS:PickAndPlaceSkill" TypeDefinition="COMPOSITE_SKILLS:PickAndPlaceSkillType" ModellingRule="Mandatory" />
+          <Object SymbolicName="COMPOSITE_SKILLS:PickAndPlaceSkill" TypeDefinition="COMPOSITE_SKILLS:PickAndPlaceSkillType" ModellingRule="Mandatory"
+                  SupportsEvents="true"/>
         </Children>
       </Object>
     </Children>

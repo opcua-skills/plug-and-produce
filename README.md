@@ -37,22 +37,15 @@ This demo depends on a few packages:
 * RoboticsLibrary: Open Source Library for Robot Algorithms and Simulation (https://github.com/roboticslibrary/rl)
 * CLI11: Command line parameter parsing (https://github.com/CLIUtils/CLI11)
 
-To install the required dependencies follow these steps:
 
-```bash
-cd plug-and-produce
-git submodule update --init --recursive
+A full list of dependencies which are required for building this repo should be taken from the corresponding docker image configuration:
 
-sudo apt-add-repository ppa:roblib/ppa && sudo apt update && sudo apt-get install -y --no-install-recommends freeglut3-dev libboost-dev libbullet-dev libbullet-extras-dev libcgal-dev libcurl4-openssl-dev libcoin80-dev libdc1394-22-dev libeigen3-dev freeglut3-dev libgraphviz-dev libnlopt-dev libode-dev libopencv-dev qtbase5-dev libsimage-dev libsoqt4-dev libsolid3d-dev libxml2-dev libxslt1-dev libzip-dev libconfig++-dev libmbedtls-dev
+[main.yml](.gihtub/workflows/main.yml)
 
-# This will install the Robotics Library on your system
-./software/semantic-mes/deps/common/tools/install_rl.sh $(pwd)/install
-    
-# Install current master
-./software/semantic-mes/deps/common/tools/install_open62541.sh 82611a487d4f2306ddfe6c9037a7686852517bf4 $(pwd)/install
 
-./software/semantic-mes/deps/common/tools/install_cli11.sh $(pwd)/install
-```
+To summarize, you will need the following packages:
+
+`libconfig++-dev`, open62541, cli11, and a current RoboticsLibrary version.
 
 ## Build project
 

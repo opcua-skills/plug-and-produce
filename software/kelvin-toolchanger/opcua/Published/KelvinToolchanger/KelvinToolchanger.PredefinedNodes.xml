@@ -785,6 +785,7 @@
           <uax:Identifier>ns=1;i=15001</uax:Identifier>
         </uax:TypeDefinitionId>
         <uax:NumericId>15212</uax:NumericId>
+        <uax:EventNotifier>1</uax:EventNotifier>
         <CurrentState xmlns="http://opcfoundation.org/UA/">
           <uax:NodeClass>Variable_2</uax:NodeClass>
           <uax:NodeId>
@@ -1405,6 +1406,7 @@
           <uax:Identifier>ns=1;i=15287</uax:Identifier>
         </uax:TypeDefinitionId>
         <uax:NumericId>15355</uax:NumericId>
+        <uax:EventNotifier>1</uax:EventNotifier>
         <CurrentState xmlns="http://opcfoundation.org/UA/">
           <uax:NodeClass>Variable_2</uax:NodeClass>
           <uax:NodeId>

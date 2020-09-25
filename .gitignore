@@ -1,3 +1,5 @@
+build/**
+exports/**
 logs/**/*
 published/**/*
 

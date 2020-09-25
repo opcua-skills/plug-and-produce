@@ -1,7 +1,10 @@
-//
-// Created by profanter on 22/01/2020.
-// Copyright (c) 2020 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #include "CompositeSkills.h"
 
@@ -21,18 +24,20 @@
 
 
 CompositeSkills::CompositeSkills(
-        std::shared_ptr<spdlog::logger> _logger,
-        UA_Server* server,
+        std::shared_ptr<spdlog::logger> _loggerApp,
+        std::shared_ptr<spdlog::logger> _loggerOpcua,
+        const std::shared_ptr<fortiss::opcua::OpcUaServer>& server,
         const libconfig::Setting& compositeSettings,
         const std::string& clientCertPath,
         const std::string& clientKeyPath,
         const std::string& clientAppUri,
         const std::string& clientName
 ) :
-        skillDetector(new SkillDetector(_logger, clientCertPath, clientKeyPath, clientAppUri, clientName)),
+        skillDetector(new SkillDetector(_loggerApp, _loggerOpcua, clientCertPath, clientKeyPath, clientAppUri, clientName)),
         isSimulation(compositeSettings["simulation"]),
         compositeSettings(compositeSettings),
-        logger(std::move(_logger)),
+        logger(std::move(_loggerApp)),
+        loggerOpcua(std::move(_loggerOpcua)),
         server(server),
         clientCertPath(clientCertPath),
         clientKeyPath(clientKeyPath),
@@ -77,15 +82,16 @@ CompositeSkills::~CompositeSkills() {
 }
 
 bool CompositeSkills::createNodesFromNodeset() {
-    if (namespace_di_generated(server) != UA_STATUSCODE_GOOD) {
+    LockedServer ls = server->getLocked();
+    if (namespace_di_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the DI namespace failed. Please check previous error output.");
         return false;
     }
-    if (namespace_fortiss_device_generated(server) != UA_STATUSCODE_GOOD) {
+    if (namespace_fortiss_device_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the fortiss device namespace failed. Please check previous error output.");
         return false;
     }
-    if (namespace_composite_skills_generated(server) != UA_STATUSCODE_GOOD) {
+    if (namespace_composite_skills_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the Kelvin Toolchanger namespace failed. Please check previous error output.");
         return false;
     }
@@ -100,7 +106,7 @@ UA_StatusCode CompositeSkills::initSkills() {
             UA_COMPOSITE_SKILLSID_COMPOSITESKILLS_SKILLS_PICKANDPLACESKILL
     );
 
-    pickAndPlaceSkillImpl = new fortiss::composite_skills::PickAndPlaceSkillImpl(logger, this);
+    pickAndPlaceSkillImpl = new fortiss::composite_skills::PickAndPlaceSkillImpl(logger, loggerOpcua, this);
 
     pickAndPlaceSkill = std::make_unique<fortiss::opcua::skill::PickAndPlaceSkill>
             (server, logger, pickAndPlaceSkillId,
@@ -117,62 +123,7 @@ void CompositeSkills::onServerAnnounce(
         const UA_ServerOnNetwork* serverOnNetwork,
         UA_Boolean isServerAnnounce
 ) {
-
-    std::string serverName = std::string((char*) serverOnNetwork->serverName.data, serverOnNetwork->serverName.length);
-
-    // create a copy of registered server struct since it may be deleted while the thread is still running.
-    UA_ServerOnNetwork* serverOnNetworkTemp = UA_ServerOnNetwork_new();
-    UA_ServerOnNetwork_copy(serverOnNetwork, serverOnNetworkTemp);
-    std::shared_ptr<UA_ServerOnNetwork> serverOnNetworkSafe = std::shared_ptr<UA_ServerOnNetwork>(serverOnNetworkTemp, [=](UA_ServerOnNetwork* ptr) {
-        UA_ServerOnNetwork_delete(ptr);
-    });
-
-    if (isServerAnnounce) {
-
-        std::vector<std::string> discoveryUrls;
-
-        std::string discoveryUrl = std::string((char*) serverOnNetwork->discoveryUrl.data, serverOnNetwork->discoveryUrl.length);
-
-        if (serverKnown.count(discoveryUrl) > 0)
-            return;
-
-        logger->info("Got register from component: {}", serverName);
-
-        discoveryUrls.emplace_back(discoveryUrl);
-        serverKnown.emplace(discoveryUrl, true);
-
-        std::thread([this, serverOnNetworkSafe, discoveryUrls]() {
-
-            std::shared_ptr<spdlog::logger> loggerClient = logger->clone(logger->name() + "-client");
-            if (loggerClient->level() < spdlog::level::err)
-                loggerClient->set_level(spdlog::level::err);
-
-            std::promise<std::shared_ptr<UA_EndpointDescription>> promiseEndpoint;
-            fortiss::opcua::getBestEndpointFromServer(discoveryUrls, promiseEndpoint, loggerClient);
-            std::future<std::shared_ptr<UA_EndpointDescription>> endpointFuture = promiseEndpoint.get_future();
-
-            std::future_status status = endpointFuture.wait_for(std::chrono::seconds(5));
-
-            if (status == std::future_status::ready) {
-                std::shared_ptr<UA_EndpointDescription> endpoint = endpointFuture.get();
-                skillDetector->componentConnected(serverOnNetworkSafe, endpoint);
-            }
-
-        }).detach();
-
-    } else {
-
-
-        std::string discoveryUrl = std::string((char*) serverOnNetwork->discoveryUrl.data, serverOnNetwork->discoveryUrl.length);
-        if (serverKnown.count(discoveryUrl) == 0)
-            return;
-
-        logger->info("Got unregister from component: {}", serverName);
-        serverKnown.erase(discoveryUrl);
-        skillDetector->componentDisconnected(serverOnNetworkSafe);
-    }
-
-
+    skillDetector->onServerAnnounce(serverOnNetwork, isServerAnnounce);
 }
 
 

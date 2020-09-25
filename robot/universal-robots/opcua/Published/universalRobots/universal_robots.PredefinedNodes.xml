@@ -3268,6 +3268,7 @@
               <uax:Identifier>ns=5;i=15384</uax:Identifier>
             </uax:TypeDefinitionId>
             <uax:NumericId>15024</uax:NumericId>
+            <uax:EventNotifier>1</uax:EventNotifier>
             <uax:References>
               <uax:Reference>
                 <uax:ReferenceTypeId>
@@ -3789,6 +3790,7 @@
               <uax:Identifier>ns=5;i=15546</uax:Identifier>
             </uax:TypeDefinitionId>
             <uax:NumericId>15078</uax:NumericId>
+            <uax:EventNotifier>1</uax:EventNotifier>
             <uax:References>
               <uax:Reference>
                 <uax:ReferenceTypeId>
@@ -4310,6 +4312,7 @@
               <uax:Identifier>ns=5;i=15303</uax:Identifier>
             </uax:TypeDefinitionId>
             <uax:NumericId>15133</uax:NumericId>
+            <uax:EventNotifier>1</uax:EventNotifier>
             <uax:References>
               <uax:Reference>
                 <uax:ReferenceTypeId>
@@ -4855,6 +4858,7 @@
               <uax:Identifier>ns=5;i=15465</uax:Identifier>
             </uax:TypeDefinitionId>
             <uax:NumericId>15185</uax:NumericId>
+            <uax:EventNotifier>1</uax:EventNotifier>
             <uax:References>
               <uax:Reference>
                 <uax:ReferenceTypeId>

@@ -970,16 +970,7 @@
           </ReferenceTypeId>
           <IsInverse>false</IsInverse>
           <TargetId>
-            <Identifier>ns=1;i=15024</Identifier>
-          </TargetId>
-        </ReferenceNode>
-        <ReferenceNode>
-          <ReferenceTypeId>
-            <Identifier>i=47</Identifier>
-          </ReferenceTypeId>
-          <IsInverse>false</IsInverse>
-          <TargetId>
-            <Identifier>ns=1;i=15026</Identifier>
+            <Identifier>ns=1;i=15029</Identifier>
           </TargetId>
         </ReferenceNode>
       </References>
@@ -1161,64 +1152,6 @@
     </Node>
     <Node i:type="VariableNode">
       <NodeId>
-        <Identifier>ns=1;i=15024</Identifier>
-      </NodeId>
-      <NodeClass>Variable_2</NodeClass>
-      <BrowseName>
-        <NamespaceIndex>1</NamespaceIndex>
-        <Name>TemperatureLive</Name>
-      </BrowseName>
-      <DisplayName>
-        <Locale></Locale>
-        <Text>TemperatureLive</Text>
-      </DisplayName>
-      <Description>
-        <Locale></Locale>
-        <Text>Current Temperature (0.1 C resolution)</Text>
-      </Description>
-      <WriteMask>0</WriteMask>
-      <UserWriteMask>0</UserWriteMask>
-      <RolePermissions />
-      <UserRolePermissions />
-      <AccessRestrictions>0</AccessRestrictions>
-      <References>
-        <ReferenceNode>
-          <ReferenceTypeId>
-            <Identifier>i=47</Identifier>
-          </ReferenceTypeId>
-          <IsInverse>true</IsInverse>
-          <TargetId>
-            <Identifier>ns=1;i=15020</Identifier>
-          </TargetId>
-        </ReferenceNode>
-        <ReferenceNode>
-          <ReferenceTypeId>
-            <Identifier>i=40</Identifier>
-          </ReferenceTypeId>
-          <IsInverse>false</IsInverse>
-          <TargetId>
-            <Identifier>i=63</Identifier>
-          </TargetId>
-        </ReferenceNode>
-      </References>
-      <Value>
-        <Value>
-          <UInt16 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">0</UInt16>
-        </Value>
-      </Value>
-      <DataType>
-        <Identifier>i=5</Identifier>
-      </DataType>
-      <ValueRank>-1</ValueRank>
-      <ArrayDimensions />
-      <AccessLevel>1</AccessLevel>
-      <UserAccessLevel>1</UserAccessLevel>
-      <MinimumSamplingInterval>0</MinimumSamplingInterval>
-      <Historizing>false</Historizing>
-      <AccessLevelEx>0</AccessLevelEx>
-    </Node>
-    <Node i:type="VariableNode">
-      <NodeId>
         <Identifier>ns=1;i=15025</Identifier>
       </NodeId>
       <NodeClass>Variable_2</NodeClass>
@@ -1277,20 +1210,20 @@
     </Node>
     <Node i:type="VariableNode">
       <NodeId>
-        <Identifier>ns=1;i=15026</Identifier>
+        <Identifier>ns=1;i=15029</Identifier>
       </NodeId>
       <NodeClass>Variable_2</NodeClass>
       <BrowseName>
         <NamespaceIndex>1</NamespaceIndex>
-        <Name>LeakageRate</Name>
+        <Name>ActualPower</Name>
       </BrowseName>
       <DisplayName>
         <Locale></Locale>
-        <Text>LeakageRate</Text>
+        <Text>ActualPower</Text>
       </DisplayName>
       <Description>
         <Locale></Locale>
-        <Text>Leakage of last suction cycle (unit 1 mbar)</Text>
+        <Text>actual power in percentage</Text>
       </Description>
       <WriteMask>0</WriteMask>
       <UserWriteMask>0</UserWriteMask>
@@ -1319,11 +1252,11 @@
       </References>
       <Value>
         <Value>
-          <UInt16 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">0</UInt16>
+          <Byte xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">0</Byte>
         </Value>
       </Value>
       <DataType>
-        <Identifier>i=5</Identifier>
+        <Identifier>i=3</Identifier>
       </DataType>
       <ValueRank>-1</ValueRank>
       <ArrayDimensions />
@@ -2208,7 +2141,7 @@
           </TargetId>
         </ReferenceNode>
       </References>
-      <EventNotifier>0</EventNotifier>
+      <EventNotifier>1</EventNotifier>
     </Node>
     <Node i:type="VariableNode">
       <NodeId>
@@ -3212,7 +3145,7 @@
           </TargetId>
         </ReferenceNode>
       </References>
-      <EventNotifier>0</EventNotifier>
+      <EventNotifier>1</EventNotifier>
     </Node>
     <Node i:type="VariableNode">
       <NodeId>

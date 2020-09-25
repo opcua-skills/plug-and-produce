@@ -47,6 +47,7 @@ ua_generate_nodeset_and_datatypes(
 
 
 add_executable(kelvin-toolchanger
+               $<TARGET_OBJECTS:${PROJECT_NAME}-common>
                $<TARGET_OBJECTS:${PROJECT_NAME}-common-client>
                $<TARGET_OBJECTS:${PROJECT_NAME}-common-nodeset>
                $<TARGET_OBJECTS:${PROJECT_NAME}-common-skill-detector>

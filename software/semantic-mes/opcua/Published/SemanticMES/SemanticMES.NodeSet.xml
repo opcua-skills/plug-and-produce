@@ -173,7 +173,7 @@
       </References>
       <Value>
         <Value>
-          <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://www.fortiss.org/ont/databackbone/process-1#Process-1</String>
+          <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://www.fortiss.org/ont/acra4dt/process-toolchange#Process-ToolChange</String>
         </Value>
       </Value>
       <DataType>
@@ -2062,7 +2062,7 @@
       </References>
       <Value>
         <Value>
-          <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://www.fortiss.org/ont/databackbone/process-1#Process-1</String>
+          <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://www.fortiss.org/ont/acra4dt/process-toolchange#Process-ToolChange</String>
         </Value>
       </Value>
       <DataType>

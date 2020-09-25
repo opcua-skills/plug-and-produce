@@ -76,7 +76,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15068</Reference>
     </References>
     <Value>
-      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://www.fortiss.org/ont/databackbone/process-1#Process-1</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://www.fortiss.org/ont/acra4dt/process-toolchange#Process-ToolChange</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="ns=1;i=15070" BrowseName="1:ExecutionMode" ParentNodeId="ns=1;i=15068" DataType="String" AccessLevel="3">
@@ -337,7 +337,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15276</Reference>
     </References>
     <Value>
-      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://www.fortiss.org/ont/databackbone/process-1#Process-1</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://www.fortiss.org/ont/acra4dt/process-toolchange#Process-ToolChange</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="ns=1;i=15278" BrowseName="1:ExecutionMode" ParentNodeId="ns=1;i=15276" DataType="String" AccessLevel="3">

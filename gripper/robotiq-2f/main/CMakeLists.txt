@@ -32,6 +32,7 @@ if(NOT LOCAL_SIMULATION)
                            GripperOPCUA.cpp
                            TinyPico.cpp
                            ${NODESET_SRCS}
+                           deps/common/server/OpcUaServer.cpp
                            INCLUDE_DIRS "./deps/common/deps/spdlog/include" "./deps/common/include" "${GENERATE_OUTPUT_DIR}" "."
                            REQUIRES open62541 ethernet_helper nvs_flash esp_adc_cal)
 
@@ -43,7 +44,9 @@ else()
     find_package(CLI11 CONFIG REQUIRED)
     include_directories($<TARGET_PROPERTY:CLI11::CLI11,INTERFACE_INCLUDE_DIRECTORIES>)
 
+    add_subdirectory(deps/common)
     add_executable(robotiq-2f
+                   $<TARGET_OBJECTS:${PROJECT_NAME}-common>
                    main_local.cpp
                    GripperOPCUA.cpp
                    SimGripper.cpp

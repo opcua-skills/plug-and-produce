@@ -798,14 +798,9 @@ namespace schmalz
         public const uint SchmalzEcbpi_Status_VacuumLive = 15023;
 
         /// <summary>
-        /// The identifier for the SchmalzEcbpi_Status_TemperatureLive Variable.
+        /// The identifier for the SchmalzEcbpi_Status_ActualPower Variable.
         /// </summary>
-        public const uint SchmalzEcbpi_Status_TemperatureLive = 15024;
-
-        /// <summary>
-        /// The identifier for the SchmalzEcbpi_Status_LeakageRate Variable.
-        /// </summary>
-        public const uint SchmalzEcbpi_Status_LeakageRate = 15026;
+        public const uint SchmalzEcbpi_Status_ActualPower = 15029;
     }
     #endregion
 
@@ -1568,14 +1563,9 @@ namespace schmalz
         public static readonly ExpandedNodeId SchmalzEcbpi_Status_VacuumLive = new ExpandedNodeId(schmalz.Variables.SchmalzEcbpi_Status_VacuumLive, schmalz.Namespaces.schmalz);
 
         /// <summary>
-        /// The identifier for the SchmalzEcbpi_Status_TemperatureLive Variable.
+        /// The identifier for the SchmalzEcbpi_Status_ActualPower Variable.
         /// </summary>
-        public static readonly ExpandedNodeId SchmalzEcbpi_Status_TemperatureLive = new ExpandedNodeId(schmalz.Variables.SchmalzEcbpi_Status_TemperatureLive, schmalz.Namespaces.schmalz);
-
-        /// <summary>
-        /// The identifier for the SchmalzEcbpi_Status_LeakageRate Variable.
-        /// </summary>
-        public static readonly ExpandedNodeId SchmalzEcbpi_Status_LeakageRate = new ExpandedNodeId(schmalz.Variables.SchmalzEcbpi_Status_LeakageRate, schmalz.Namespaces.schmalz);
+        public static readonly ExpandedNodeId SchmalzEcbpi_Status_ActualPower = new ExpandedNodeId(schmalz.Variables.SchmalzEcbpi_Status_ActualPower, schmalz.Namespaces.schmalz);
     }
     #endregion
 

@@ -1,7 +1,10 @@
-//
-// Created by profanter on 17/12/2019.
-// Copyright (c) 2019 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #ifndef KELVIN_TOOLCHANGER_KELVINTOOLCHANGER_H
 #define KELVIN_TOOLCHANGER_KELVINTOOLCHANGER_H
@@ -14,12 +17,14 @@
 #include "AdcAdapter.h"
 #include <rl/math/Transform.h>
 #include <common/rlCoachWrapper.hpp>
+#include <common/opcua/server/OpcUaServer.h>
 
 class KelvinToolchanger {
 public:
     explicit KelvinToolchanger(
             std::shared_ptr<spdlog::logger> _logger,
-            UA_Server* server,
+            std::shared_ptr<spdlog::logger> _loggerOpcua,
+            std::shared_ptr<fortiss::opcua::OpcUaServer> server,
             const libconfig::Setting& toolchangerSettings,
             const std::string& clientCertPath,
             const std::string& clientKeyPath,
@@ -51,7 +56,8 @@ public:
 
 private:
     std::shared_ptr<spdlog::logger> logger;
-    UA_Server* server;
+    std::shared_ptr<spdlog::logger> loggerOpcua;
+    std::shared_ptr<fortiss::opcua::OpcUaServer> server;
     const libconfig::Setting& toolchangerSettings;
 
     bool createNodesFromNodeset();
@@ -71,7 +77,6 @@ private:
     std::unique_ptr<fortiss::opcua::skill::DropToolSkill> dropToolSkill;
 
     SkillDetector* skillDetector = nullptr;
-    std::map<std::string, bool> serverKnown;
 
     rlCoachWrapper* coachWrapper = nullptr;
     std::string coachModelConnectionUuid;

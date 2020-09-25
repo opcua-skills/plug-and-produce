@@ -1,7 +1,10 @@
-//
-// Created by profanter on 12/11/2019.
-// Copyright (c) 2019 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #ifndef ROBOTIQ_2F_SERIAL_H
 #define ROBOTIQ_2F_SERIAL_H
