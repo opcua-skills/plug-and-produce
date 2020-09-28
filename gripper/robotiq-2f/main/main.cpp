@@ -1,11 +1,10 @@
-/* Hello World Example
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #include <esp_wifi.h>
 #include <esp_event.h>
@@ -22,7 +21,7 @@
 #include "driver/uart.h"
 #include "esp_log.h"
 
-#include "tcpip_adapter.h"
+#include "esp_netif.h"
 #include "ethernet_helper.h"
 
 #include "TinyPico.h"
@@ -87,6 +86,8 @@ static const char *TAG = "RS485_APP";
 
 static bool serverCreated = false;
 
+#define OPCUA_TASK_PRIORITY ESP_TASK_TCPIP_PRIO -1
+
 /* Variable holding number of times ESP32 restarted since first boot.
  * It is placed into RTC memory using RTC_DATA_ATTR and
  * maintains its value when ESP32 wakes from deep sleep.
@@ -112,7 +113,7 @@ static void opcua_task(void *arg) {
     ESP_ERROR_CHECK(esp_task_wdt_delete(NULL));
 
     while (true) {
-        std::this_thread::yield();
+        sleep(100000);
     }
 }
 
@@ -185,7 +186,7 @@ static void connect_handler(void* arg, esp_event_base_t event_base,
     tinyPico->DotStar_SetPixelColor(255, 255, 0);
     if (!serverCreated) {
         ESP_LOGI(TAG, "Starting OPC UA Task");
-        xTaskCreate(opcua_task, "opcua_task", 32448, NULL, 10, NULL);
+        xTaskCreate(opcua_task, "opcua_task", 26624, NULL, OPCUA_TASK_PRIORITY, NULL);
         serverCreated = true;
     }
 }
@@ -221,7 +222,7 @@ void app_main(void)
     //static UA_Server *server = NULL;
 
     ESP_ERROR_CHECK(nvs_flash_init());
-    tcpip_adapter_init();
+    esp_netif_init();
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
 
@@ -230,10 +231,12 @@ void app_main(void)
     tinyPico->DotStar_SetPixelColor(0, 0, 128);
 
 
-    ESP_ERROR_CHECK(esp_task_wdt_init(10, true));
+    ESP_ERROR_CHECK(esp_task_wdt_init(30, true));
     // Remove idle tasks from watchdog
     ESP_ERROR_CHECK(esp_task_wdt_delete(xTaskGetIdleTaskHandleForCPU(0)));
     ESP_ERROR_CHECK(esp_task_wdt_delete(xTaskGetIdleTaskHandleForCPU(1)));
+
+    //ethernet_helper_init_mdns();
 
     /* Register event handlers to stop the server when Wi-Fi or Ethernet is disconnected,
      * and re-start it upon connection.

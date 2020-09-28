@@ -53,10 +53,20 @@
     <DisplayName>PickAndPlaceSkill</DisplayName>
     <Description>Pick and Place skill</Description>
     <References>
+      <Reference ReferenceType="HasComponent">ns=1;i=15282</Reference>
       <Reference ReferenceType="HasComponent">ns=1;i=15068</Reference>
       <Reference ReferenceType="HasSubtype" IsForward="false">ns=2;i=15034</Reference>
     </References>
   </UAObjectType>
+  <UAVariable NodeId="ns=1;i=15282" BrowseName="1:SkillStep" ParentNodeId="ns=1;i=15001" DataType="String">
+    <DisplayName>SkillStep</DisplayName>
+    <Description>The current executed step represented as string. I.e., Pick-Approach, Pick-Up, Move-Place, ...</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+      <Reference ReferenceType="HasModellingRule">i=78</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15001</Reference>
+    </References>
+  </UAVariable>
   <UAObject NodeId="ns=1;i=15068" BrowseName="3:ParameterSet" ParentNodeId="ns=1;i=15001">
     <DisplayName>ParameterSet</DisplayName>
     <References>
@@ -274,7 +284,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15156</Reference>
     </References>
   </UAObject>
-  <UAObject NodeId="ns=1;i=15227" BrowseName="1:PickAndPlaceSkill" ParentNodeId="ns=1;i=15226">
+  <UAObject NodeId="ns=1;i=15227" BrowseName="1:PickAndPlaceSkill" ParentNodeId="ns=1;i=15226" EventNotifier="1">
     <DisplayName>PickAndPlaceSkill</DisplayName>
     <References>
       <Reference ReferenceType="HasComponent">ns=1;i=15228</Reference>
@@ -288,6 +298,7 @@
       <Reference ReferenceType="HasComponent">ns=1;i=15261</Reference>
       <Reference ReferenceType="HasComponent">ns=1;i=15262</Reference>
       <Reference ReferenceType="HasComponent">ns=1;i=15263</Reference>
+      <Reference ReferenceType="HasComponent">ns=1;i=15283</Reference>
       <Reference ReferenceType="HasComponent">ns=1;i=15264</Reference>
       <Reference ReferenceType="HasTypeDefinition">ns=1;i=15001</Reference>
       <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15226</Reference>
@@ -405,6 +416,14 @@
       <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15227</Reference>
     </References>
   </UAMethod>
+  <UAVariable NodeId="ns=1;i=15283" BrowseName="1:SkillStep" ParentNodeId="ns=1;i=15227" DataType="String">
+    <DisplayName>SkillStep</DisplayName>
+    <Description>The current executed step represented as string. I.e., Pick-Approach, Pick-Up, Move-Place, ...</Description>
+    <References>
+      <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
+      <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15227</Reference>
+    </References>
+  </UAVariable>
   <UAObject NodeId="ns=1;i=15264" BrowseName="3:ParameterSet" ParentNodeId="ns=1;i=15227">
     <DisplayName>ParameterSet</DisplayName>
     <References>

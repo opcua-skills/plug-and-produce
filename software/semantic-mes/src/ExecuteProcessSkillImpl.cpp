@@ -1,7 +1,10 @@
-//
-// Created by profanter on 07/08/2019.
-// Copyright (c) 2019 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #include "ExecuteProcessSkillImpl.h"
 #include "SemanticMes.h"
@@ -24,11 +27,15 @@ bool ExecuteProcessSkillImpl::start(const std::string& abstractProcessIri,
                      abstractProcessIri, executionMode);
 
         UA_StatusCode result = semanticMes->startExecution(abstractProcessIri, executionMode);
-        if (result != UA_STATUSCODE_GOOD) {
-            this->executionErrored();
+
+
+        {
+            std::lock_guard<std::recursive_mutex> lc(fortiss::opcua::serverMutex);
+            if (result != UA_STATUSCODE_GOOD) {
+                this->executionErrored();
+            } else
+                this->executionFinished();
         }
-        else
-            this->executionFinished();
     });
     t.detach();
 

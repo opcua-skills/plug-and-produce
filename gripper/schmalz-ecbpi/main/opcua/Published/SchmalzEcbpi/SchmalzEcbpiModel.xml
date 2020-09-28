@@ -38,8 +38,10 @@
                 <Description>Contains the skills of the gripper controller.</Description>
                 <Children>
                     <!--Object SymbolicName="DEVICE:MoveGripperSkill" TypeDefinition="DEVICE:MoveGripperSkillType" ModellingRule="Optional" /-->
-                    <Object SymbolicName="DEVICE:ReleaseGripperSkill" TypeDefinition="DEVICE:ReleaseGripperSkillType" ModellingRule="Mandatory" />
-                    <Object SymbolicName="DEVICE:GraspGripperSkill" TypeDefinition="DEVICE:GraspGripperSkillType" ModellingRule="Mandatory" />
+                    <Object SymbolicName="DEVICE:ReleaseGripperSkill" TypeDefinition="DEVICE:ReleaseGripperSkillType" ModellingRule="Mandatory"
+                            SupportsEvents="true" />
+                    <Object SymbolicName="DEVICE:GraspGripperSkill" TypeDefinition="DEVICE:GraspGripperSkillType" ModellingRule="Mandatory"
+                            SupportsEvents="true" />
                 </Children>
             </Object>
             <Object SymbolicName="DEVICE:GripPoints" TypeDefinition="OpcUa:BaseObjectType" ModellingRule="Mandatory">
@@ -90,11 +92,14 @@
                     <Variable SymbolicName="SCHMALZ:VacuumLive" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:UInt16" ModellingRule="Mandatory">
                         <Description>Current Vaccum Value in mbar resolution</Description>
                     </Variable>
-                    <Variable SymbolicName="SCHMALZ:TemperatureLive" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:UInt16" ModellingRule="Mandatory">
+                    <!--Variable SymbolicName="SCHMALZ:TemperatureLive" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:UInt16" ModellingRule="Mandatory">
                         <Description>Current Temperature (0.1 C resolution)</Description>
                     </Variable>
                     <Variable SymbolicName="SCHMALZ:LeakageRate" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:UInt16" ModellingRule="Mandatory">
                         <Description>Leakage of last suction cycle (unit 1 mbar)</Description>
+                    </Variable-->
+                    <Variable SymbolicName="SCHMALZ:ActualPower" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:Byte" ModellingRule="Mandatory">
+                        <Description>actual power in percentage</Description>
                     </Variable>
                 </Children>
             </Object>

@@ -1,7 +1,10 @@
-//
-// Created by profanter on 17/12/2019.
-// Copyright (c) 2019 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #include <di_nodeids.h>
 #include "PickAndPlaceSkillImpl.h"
@@ -15,10 +18,11 @@
 using namespace fortiss::composite_skills;
 
 PickAndPlaceSkillImpl::PickAndPlaceSkillImpl(
-        std::shared_ptr<spdlog::logger> logger,
+        std::shared_ptr<spdlog::logger> _logger,
+        std::shared_ptr<spdlog::logger> _loggerOpcua,
         CompositeSkills* compositeSkills
 ) :
-        logger(std::move(logger)), compositeSkills(compositeSkills) {
+        logger(std::move(_logger)), loggerOpcua(std::move(_loggerOpcua)), compositeSkills(compositeSkills) {
 
 }
 
@@ -113,16 +117,18 @@ UA_StatusCode PickAndPlaceSkillImpl::pickAndPlaceObject(
     std::shared_ptr<RegisteredSkill> graspSkill = nullptr;
     std::shared_ptr<RegisteredSkill> releaseSkill = nullptr;
 
+    setStep("Init");
+
     {
         std::vector<std::shared_ptr<RegisteredSkill>> skills = this->compositeSkills->skillDetector->getSkillForEndpoint(moveControllerEndpoint,
                                                                                                                          "CartesianLinearMoveSkill");
         if (skills.empty()) {
-            logger->error("No skill registered for Type CartesianLinearMoveSkill");
+            logger->error("No skill registered for Type CartesianLinearMoveSkill with endpoint {}", moveControllerEndpoint);
             return UA_STATUSCODE_BADNOTFOUND;
         }
 
         if (skills.size() > 1) {
-            logger->error("More than one skill registered for Type CartesianLinearMoveSkill");
+            logger->error("More than one skill registered for Type CartesianLinearMoveSkill with endpoint {}", moveControllerEndpoint);
             return UA_STATUSCODE_BADINVALIDSTATE;
         }
         robotCartesianLinearMoveSkill = skills.at(0);
@@ -132,19 +138,19 @@ UA_StatusCode PickAndPlaceSkillImpl::pickAndPlaceObject(
         std::vector<std::shared_ptr<RegisteredSkill>> skills = this->compositeSkills->skillDetector->getSkillForEndpoint(moveControllerEndpoint,
                                                                                                                          "CartesianPtpMoveSkill");
         if (skills.empty()) {
-            logger->error("No skill registered for Type CartesianPtpMoveSkill");
+            logger->error("No skill registered for Type CartesianPtpMoveSkill with endpoint {}", moveControllerEndpoint);
             return UA_STATUSCODE_BADNOTFOUND;
         }
 
         if (skills.size() > 1) {
-            logger->error("More than one skill registered for Type CartesianPtpMoveSkill");
+            logger->error("More than one skill registered for Type CartesianPtpMoveSkill with endpoint {}", moveControllerEndpoint);
             return UA_STATUSCODE_BADINVALIDSTATE;
         }
         robotCartesianPtpMoveSkill = skills.at(0);
     }
 
     // wait a bit to allow tool to register itself if this skill is immediately called after toolchange
-    for (int i = 0; i < 60; i++) {
+    for (int i = 0; i < 120; i++) {
         if (this->compositeSkills->skillDetector->getComponentForEndpoint(toolControllerEndpoint))
             break;
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -153,7 +159,7 @@ UA_StatusCode PickAndPlaceSkillImpl::pickAndPlaceObject(
         std::vector<std::shared_ptr<RegisteredSkill>> skills = this->compositeSkills->skillDetector->getSkillForEndpoint(toolControllerEndpoint,
                                                                                                                          "GraspGripperSkill");
         if (skills.empty()) {
-            logger->error("No skill registered for Type GraspGripperSkill");
+            logger->error("No skill registered for Type GraspGripperSkill with endpoint {}", toolControllerEndpoint);
             return UA_STATUSCODE_BADNOTFOUND;
         }
 
@@ -168,7 +174,7 @@ UA_StatusCode PickAndPlaceSkillImpl::pickAndPlaceObject(
         std::vector<std::shared_ptr<RegisteredSkill>> skills = this->compositeSkills->skillDetector->getSkillForEndpoint(toolControllerEndpoint,
                                                                                                                          "ReleaseGripperSkill");
         if (skills.empty()) {
-            logger->error("No skill registered for Type ReleaseGripperSkill");
+            logger->error("No skill registered for Type ReleaseGripperSkill with endpoint {}", toolControllerEndpoint);
             return UA_STATUSCODE_BADNOTFOUND;
         }
 
@@ -233,7 +239,7 @@ UA_StatusCode PickAndPlaceSkillImpl::pickAndPlaceObject(
     // TODO for now we assume the object has a height of the following in meters
     // Later on we need to get the object size and geometry from the world model (based on the object id).
     // and then automatically select a good grasping point for the corresponding grip type (vacuum, parallel, ...)
-    double height = 0.04;
+    double height = 0.005;
 
 
     switch (gripType) {
@@ -248,10 +254,14 @@ UA_StatusCode PickAndPlaceSkillImpl::pickAndPlaceObject(
                     180.0 * DEG_TO_RAD,
                     ::rl::math::Vector3::UnitX()
             );
-            objectGripOffset.translation().x() = 0;
-            objectGripOffset.translation().y() = 0;
+            //objectGripOffset.translation().x() = 0;
+            //objectGripOffset.translation().y() = 0;
             // grasp object in the middle
-            objectGripOffset.translation().z() = height / 2.0;
+            //objectGripOffset.translation().z() = height / 2.0;
+            objectGripOffset.translation().x() = 0.05;
+            objectGripOffset.translation().y() = 0.0;
+            // grasp object in the middle
+            objectGripOffset.translation().z() = 0.02;
             break;
         case UA_GRIPTYPEENUMERATION_VACUUM:
             // grasp object on top. So no offset.
@@ -309,9 +319,11 @@ UA_StatusCode PickAndPlaceSkillImpl::pickAndPlaceObject(
     printTransform(logger, "robotToPlacePosition", robotToPlacePosition);
     printTransform(logger, "robotToPlaceApproachPosition", robotToPlaceApproachPosition);
 
+    setStep("MovePickApproachBefore");
     if (const UA_StatusCode ret = fortiss::skill::moveRobotToCartesian(
             robotCartesianPtpMoveSkill,
             logger,
+            loggerOpcua,
             robotToPickApproachPosition,
             "",
             fastCartSpeed) != UA_STATUSCODE_GOOD) {
@@ -319,9 +331,11 @@ UA_StatusCode PickAndPlaceSkillImpl::pickAndPlaceObject(
         return ret;
     }
 
+    setStep("MovePick");
     if (const UA_StatusCode ret = fortiss::skill::moveRobotToCartesian(
             robotCartesianLinearMoveSkill,
             logger,
+            loggerOpcua,
             robotToPickupPosition,
             "",
             slowCartSpeed) != UA_STATUSCODE_GOOD) {
@@ -369,17 +383,32 @@ UA_StatusCode PickAndPlaceSkillImpl::pickAndPlaceObject(
         }
     }
 
+    setStep("Grasp");
     if (const UA_StatusCode ret = fortiss::skill::callSkillNoParameters(
             graspSkill,
-            logger) != UA_STATUSCODE_GOOD) {
+            logger,
+            loggerOpcua) != UA_STATUSCODE_GOOD) {
         logger->error("Cold not call grasp. {}", UA_StatusCode_name(ret));
+        setStep("MovePickApproachError");
+        if (const UA_StatusCode ret2 = fortiss::skill::moveRobotToCartesian(
+                robotCartesianLinearMoveSkill,
+                logger,
+                loggerOpcua,
+                robotToPickApproachPosition,
+                "",
+                fastCartSpeed) != UA_STATUSCODE_GOOD) {
+            logger->error("Cold not move to After Pick Approach position. {}", UA_StatusCode_name(ret2));
+            return ret2;
+        }
         return ret;
     }
 
 
+    setStep("MovePickApproachAfter");
     if (const UA_StatusCode ret = fortiss::skill::moveRobotToCartesian(
             robotCartesianLinearMoveSkill,
             logger,
+            loggerOpcua,
             robotToPickApproachPosition,
             "",
             fastCartSpeed) != UA_STATUSCODE_GOOD) {
@@ -387,9 +416,11 @@ UA_StatusCode PickAndPlaceSkillImpl::pickAndPlaceObject(
         return ret;
     }
 
+    setStep("MovePlaceApproachBefore");
     if (const UA_StatusCode ret = fortiss::skill::moveRobotToCartesian(
             robotCartesianPtpMoveSkill,
             logger,
+            loggerOpcua,
             robotToPlaceApproachPosition,
             "",
             fastCartSpeed) != UA_STATUSCODE_GOOD) {
@@ -397,9 +428,11 @@ UA_StatusCode PickAndPlaceSkillImpl::pickAndPlaceObject(
         return ret;
     }
 
+    setStep("MovePlace");
     if (const UA_StatusCode ret = fortiss::skill::moveRobotToCartesian(
             robotCartesianLinearMoveSkill,
             logger,
+            loggerOpcua,
             robotToPlacePosition,
             "",
             slowCartSpeed) != UA_STATUSCODE_GOOD) {
@@ -411,24 +444,41 @@ UA_StatusCode PickAndPlaceSkillImpl::pickAndPlaceObject(
         compositeSkills->coachWrapper->removeConnection(coachObjectConnectionUuid);
     }
 
+    setStep("Release");
     if (const UA_StatusCode ret = fortiss::skill::callSkillNoParameters(
             releaseSkill,
-            logger) != UA_STATUSCODE_GOOD) {
+            logger,
+            loggerOpcua) != UA_STATUSCODE_GOOD) {
         logger->error("Cold not call release. {}", UA_StatusCode_name(ret));
+        setStep("MovePlaceApproachError");
+        if (const UA_StatusCode ret2 = fortiss::skill::moveRobotToCartesian(
+                robotCartesianLinearMoveSkill,
+                logger,
+                loggerOpcua,
+                robotToPlaceApproachPosition,
+                "",
+                fastCartSpeed) != UA_STATUSCODE_GOOD) {
+            logger->error("Cold not move to After Place Approach position. {}", UA_StatusCode_name(ret2));
+            return ret2;
+        }
         return ret;
     }
 
     compositeSkills->setObjectFrame(objectId, placeObjectWorldFrame);
 
+    setStep("MovePlaceApproachAfter");
     if (const UA_StatusCode ret = fortiss::skill::moveRobotToCartesian(
             robotCartesianLinearMoveSkill,
             logger,
+            loggerOpcua,
             robotToPlaceApproachPosition,
             "",
             fastCartSpeed) != UA_STATUSCODE_GOOD) {
         logger->error("Cold not move to After Place Approach position. {}", UA_StatusCode_name(ret));
         return ret;
     }
+
+    setStep("Idle");
 
     return UA_STATUSCODE_GOOD;
 }
@@ -453,6 +503,9 @@ UA_StatusCode PickAndPlaceSkillImpl::getToolPickOffset(
     UA_NodeId skillControllerType = UA_NODEID_NUMERIC(component->nsFortissDiIdx, UA_FORTISS_DEVICEID_IGRIPPERTYPE);
 
     std::vector<std::shared_ptr<UA_NodeId>> foundIds;
+
+    if (!component->ensureConnected())
+        return UA_STATUSCODE_BADNOTCONNECTED;
 
     {
         LockedClient lc = component->getLockedClient();

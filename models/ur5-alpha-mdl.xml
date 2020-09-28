@@ -371,12 +371,12 @@
 			</translation>
 		</fixed>
 		<home>
-			<q unit="deg">-10.12</q>
-			<q unit="deg">-98.55</q>
-			<q unit="deg">-100.40</q>
-			<q unit="deg">-71.04</q>
+			<q unit="deg">12.57</q>
+			<q unit="deg">-93.39</q>
+			<q unit="deg">-106.17</q>
+			<q unit="deg">-70.42</q>
 			<q unit="deg">90.00</q>
-			<q unit="deg">-10.12</q>
+			<q unit="deg">12.57</q>
 		</home>
 	</model>
 </rlmdl>

@@ -2,6 +2,7 @@ build-Default
 CMakeLists.txt.user
 
 build/**
+logs/**
 cmake-build-debug/**
 certs/**
 cppcheck.txt

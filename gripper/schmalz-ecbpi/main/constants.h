@@ -1,7 +1,10 @@
-//
-// Created by profanter on 26/11/2019.
-// Copyright (c) 2019 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #ifndef IOLMA_HL_CMAKE_SRCDEMO_CONSTANTS_H
 #define IOLMA_HL_CMAKE_SRCDEMO_CONSTANTS_H

@@ -390,6 +390,7 @@
           <uax:Identifier>ns=2;i=15473</uax:Identifier>
         </uax:TypeDefinitionId>
         <uax:NumericId>15371</uax:NumericId>
+        <uax:EventNotifier>1</uax:EventNotifier>
         <CurrentState xmlns="http://opcfoundation.org/UA/">
           <uax:NodeClass>Variable_2</uax:NodeClass>
           <uax:NodeId>
@@ -755,6 +756,7 @@
           <uax:Identifier>ns=2;i=15168</uax:Identifier>
         </uax:TypeDefinitionId>
         <uax:NumericId>15415</uax:NumericId>
+        <uax:EventNotifier>1</uax:EventNotifier>
         <CurrentState xmlns="http://opcfoundation.org/UA/">
           <uax:NodeClass>Variable_2</uax:NodeClass>
           <uax:NodeId>
@@ -1533,18 +1535,18 @@
         <uax:AccessLevel>1</uax:AccessLevel>
         <uax:UserAccessLevel>1</uax:UserAccessLevel>
       </VacuumLive>
-      <TemperatureLive>
+      <ActualPower>
         <uax:NodeClass>Variable_2</uax:NodeClass>
         <uax:NodeId>
-          <uax:Identifier>ns=1;i=15024</uax:Identifier>
+          <uax:Identifier>ns=1;i=15029</uax:Identifier>
         </uax:NodeId>
         <uax:BrowseName>
           <uax:NamespaceIndex>1</uax:NamespaceIndex>
-          <uax:Name>TemperatureLive</uax:Name>
+          <uax:Name>ActualPower</uax:Name>
         </uax:BrowseName>
         <uax:Description>
           <uax:Locale></uax:Locale>
-          <uax:Text>Current Temperature (0.1 C resolution)</uax:Text>
+          <uax:Text>actual power in percentage</uax:Text>
         </uax:Description>
         <uax:ReferenceTypeId>
           <uax:Identifier>i=47</uax:Identifier>
@@ -1552,41 +1554,14 @@
         <uax:TypeDefinitionId>
           <uax:Identifier>i=63</uax:Identifier>
         </uax:TypeDefinitionId>
-        <uax:NumericId>15024</uax:NumericId>
+        <uax:NumericId>15029</uax:NumericId>
         <uax:DataType>
-          <uax:Identifier>i=5</uax:Identifier>
+          <uax:Identifier>i=3</uax:Identifier>
         </uax:DataType>
         <uax:ValueRank>-1</uax:ValueRank>
         <uax:AccessLevel>1</uax:AccessLevel>
         <uax:UserAccessLevel>1</uax:UserAccessLevel>
-      </TemperatureLive>
-      <LeakageRate>
-        <uax:NodeClass>Variable_2</uax:NodeClass>
-        <uax:NodeId>
-          <uax:Identifier>ns=1;i=15026</uax:Identifier>
-        </uax:NodeId>
-        <uax:BrowseName>
-          <uax:NamespaceIndex>1</uax:NamespaceIndex>
-          <uax:Name>LeakageRate</uax:Name>
-        </uax:BrowseName>
-        <uax:Description>
-          <uax:Locale></uax:Locale>
-          <uax:Text>Leakage of last suction cycle (unit 1 mbar)</uax:Text>
-        </uax:Description>
-        <uax:ReferenceTypeId>
-          <uax:Identifier>i=47</uax:Identifier>
-        </uax:ReferenceTypeId>
-        <uax:TypeDefinitionId>
-          <uax:Identifier>i=63</uax:Identifier>
-        </uax:TypeDefinitionId>
-        <uax:NumericId>15026</uax:NumericId>
-        <uax:DataType>
-          <uax:Identifier>i=5</uax:Identifier>
-        </uax:DataType>
-        <uax:ValueRank>-1</uax:ValueRank>
-        <uax:AccessLevel>1</uax:AccessLevel>
-        <uax:UserAccessLevel>1</uax:UserAccessLevel>
-      </LeakageRate>
+      </ActualPower>
     </Status>
   </SchmalzEcbpi>
 </uax:ListOfNodeState>

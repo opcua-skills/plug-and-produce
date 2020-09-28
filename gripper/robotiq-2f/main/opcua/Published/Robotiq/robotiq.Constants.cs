@@ -181,6 +181,31 @@ namespace robotiq
         /// The identifier for the Robotiq2F_Skills_GraspGripperSkill_Start Method.
         /// </summary>
         public const uint Robotiq2F_Skills_GraspGripperSkill_Start = 15222;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_Halt Method.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_Halt = 15282;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_Reset Method.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_Reset = 15283;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_Resume Method.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_Resume = 15284;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_Suspend Method.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_Suspend = 15285;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_Start Method.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_Start = 15286;
     }
     #endregion
 
@@ -221,6 +246,16 @@ namespace robotiq
         /// The identifier for the Robotiq2F_Skills_GraspGripperSkill Object.
         /// </summary>
         public const uint Robotiq2F_Skills_GraspGripperSkill = 15186;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill Object.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill = 15250;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ParameterSet Object.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ParameterSet = 15287;
 
         /// <summary>
         /// The identifier for the Robotiq2F_GripPoints Object.
@@ -723,6 +758,136 @@ namespace robotiq
         public const uint Robotiq2F_Skills_GraspGripperSkill_ParameterSet_Force_EURange = 15228;
 
         /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_CurrentState Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_CurrentState = 15251;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_CurrentState_Id Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_CurrentState_Id = 15252;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_CurrentState_Number Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_CurrentState_Number = 15254;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_LastTransition Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_LastTransition = 15256;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_LastTransition_Id Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_LastTransition_Id = 15257;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_LastTransition_Number Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_LastTransition_Number = 15259;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_LastTransition_TransitionTime Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_LastTransition_TransitionTime = 15260;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_Deletable Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_Deletable = 15264;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_AutoDelete Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_AutoDelete = 15265;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_RecycleCount Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_RecycleCount = 15266;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_CreateSessionId Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_CreateSessionId = 15268;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_CreateClientName Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_CreateClientName = 15269;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_InvocationCreationTime Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_InvocationCreationTime = 15270;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastTransitionTime Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastTransitionTime = 15271;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodCall Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodCall = 15272;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodSessionId Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodSessionId = 15273;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodInputArguments Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodInputArguments = 15274;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodOutputArguments Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodOutputArguments = 15275;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodInputValues Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodInputValues = 15276;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodOutputValues Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodOutputValues = 15277;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodCallTime Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodCallTime = 15278;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodReturnStatus Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodReturnStatus = 15279;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_MaxInstanceCount Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_MaxInstanceCount = 15281;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ParameterSet_Width Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ParameterSet_Width = 15288;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ParameterSet_Width_EURange Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ParameterSet_Width_EURange = 15292;
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ParameterSet_Force_EURange Variable.
+        /// </summary>
+        public const uint Robotiq2F_Skills_MoveGripperSkill_ParameterSet_Force_EURange = 15298;
+
+        /// <summary>
         /// The identifier for the Robotiq2F_GripPoints_Tip_Type Variable.
         /// </summary>
         public const uint Robotiq2F_GripPoints_Tip_Type = 15234;
@@ -921,6 +1086,31 @@ namespace robotiq
         /// The identifier for the Robotiq2F_Skills_GraspGripperSkill_Start Method.
         /// </summary>
         public static readonly ExpandedNodeId Robotiq2F_Skills_GraspGripperSkill_Start = new ExpandedNodeId(robotiq.Methods.Robotiq2F_Skills_GraspGripperSkill_Start, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_Halt Method.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_Halt = new ExpandedNodeId(robotiq.Methods.Robotiq2F_Skills_MoveGripperSkill_Halt, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_Reset Method.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_Reset = new ExpandedNodeId(robotiq.Methods.Robotiq2F_Skills_MoveGripperSkill_Reset, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_Resume Method.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_Resume = new ExpandedNodeId(robotiq.Methods.Robotiq2F_Skills_MoveGripperSkill_Resume, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_Suspend Method.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_Suspend = new ExpandedNodeId(robotiq.Methods.Robotiq2F_Skills_MoveGripperSkill_Suspend, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_Start Method.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_Start = new ExpandedNodeId(robotiq.Methods.Robotiq2F_Skills_MoveGripperSkill_Start, robotiq.Namespaces.robotiq);
     }
     #endregion
 
@@ -961,6 +1151,16 @@ namespace robotiq
         /// The identifier for the Robotiq2F_Skills_GraspGripperSkill Object.
         /// </summary>
         public static readonly ExpandedNodeId Robotiq2F_Skills_GraspGripperSkill = new ExpandedNodeId(robotiq.Objects.Robotiq2F_Skills_GraspGripperSkill, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill Object.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill = new ExpandedNodeId(robotiq.Objects.Robotiq2F_Skills_MoveGripperSkill, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ParameterSet Object.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ParameterSet = new ExpandedNodeId(robotiq.Objects.Robotiq2F_Skills_MoveGripperSkill_ParameterSet, robotiq.Namespaces.robotiq);
 
         /// <summary>
         /// The identifier for the Robotiq2F_GripPoints Object.
@@ -1461,6 +1661,136 @@ namespace robotiq
         /// The identifier for the Robotiq2F_Skills_GraspGripperSkill_ParameterSet_Force_EURange Variable.
         /// </summary>
         public static readonly ExpandedNodeId Robotiq2F_Skills_GraspGripperSkill_ParameterSet_Force_EURange = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_GraspGripperSkill_ParameterSet_Force_EURange, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_CurrentState Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_CurrentState = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_CurrentState, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_CurrentState_Id Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_CurrentState_Id = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_CurrentState_Id, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_CurrentState_Number Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_CurrentState_Number = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_CurrentState_Number, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_LastTransition Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_LastTransition = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_LastTransition, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_LastTransition_Id Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_LastTransition_Id = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_LastTransition_Id, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_LastTransition_Number Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_LastTransition_Number = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_LastTransition_Number, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_LastTransition_TransitionTime Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_LastTransition_TransitionTime = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_LastTransition_TransitionTime, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_Deletable Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_Deletable = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_Deletable, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_AutoDelete Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_AutoDelete = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_AutoDelete, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_RecycleCount Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_RecycleCount = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_RecycleCount, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_CreateSessionId Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_CreateSessionId = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_CreateSessionId, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_CreateClientName Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_CreateClientName = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_CreateClientName, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_InvocationCreationTime Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_InvocationCreationTime = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_InvocationCreationTime, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastTransitionTime Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastTransitionTime = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastTransitionTime, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodCall Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodCall = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodCall, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodSessionId Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodSessionId = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodSessionId, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodInputArguments Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodInputArguments = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodInputArguments, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodOutputArguments Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodOutputArguments = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodOutputArguments, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodInputValues Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodInputValues = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodInputValues, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodOutputValues Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodOutputValues = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodOutputValues, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodCallTime Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodCallTime = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodCallTime, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodReturnStatus Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodReturnStatus = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_ProgramDiagnostic_LastMethodReturnStatus, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_MaxInstanceCount Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_MaxInstanceCount = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_MaxInstanceCount, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ParameterSet_Width Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ParameterSet_Width = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_ParameterSet_Width, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ParameterSet_Width_EURange Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ParameterSet_Width_EURange = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_ParameterSet_Width_EURange, robotiq.Namespaces.robotiq);
+
+        /// <summary>
+        /// The identifier for the Robotiq2F_Skills_MoveGripperSkill_ParameterSet_Force_EURange Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId Robotiq2F_Skills_MoveGripperSkill_ParameterSet_Force_EURange = new ExpandedNodeId(robotiq.Variables.Robotiq2F_Skills_MoveGripperSkill_ParameterSet_Force_EURange, robotiq.Namespaces.robotiq);
 
         /// <summary>
         /// The identifier for the Robotiq2F_GripPoints_Tip_Type Variable.

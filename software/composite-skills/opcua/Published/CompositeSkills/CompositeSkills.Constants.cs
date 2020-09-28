@@ -378,6 +378,11 @@ namespace CompositeSkills
         public const uint PickAndPlaceSkillType_ReadyToHalted_TransitionNumber = 15061;
 
         /// <summary>
+        /// The identifier for the PickAndPlaceSkillType_SkillStep Variable.
+        /// </summary>
+        public const uint PickAndPlaceSkillType_SkillStep = 15282;
+
+        /// <summary>
         /// The identifier for the PickAndPlaceSkillType_ParameterSet_ObjectId Variable.
         /// </summary>
         public const uint PickAndPlaceSkillType_ParameterSet_ObjectId = 15069;
@@ -771,6 +776,11 @@ namespace CompositeSkills
         /// The identifier for the CompositeSkills_Skills_PickAndPlaceSkill_MaxInstanceCount Variable.
         /// </summary>
         public const uint CompositeSkills_Skills_PickAndPlaceSkill_MaxInstanceCount = 15258;
+
+        /// <summary>
+        /// The identifier for the CompositeSkills_Skills_PickAndPlaceSkill_SkillStep Variable.
+        /// </summary>
+        public const uint CompositeSkills_Skills_PickAndPlaceSkill_SkillStep = 15283;
 
         /// <summary>
         /// The identifier for the CompositeSkills_Skills_PickAndPlaceSkill_ParameterSet_ObjectId Variable.
@@ -1173,6 +1183,11 @@ namespace CompositeSkills
         public static readonly ExpandedNodeId PickAndPlaceSkillType_ReadyToHalted_TransitionNumber = new ExpandedNodeId(CompositeSkills.Variables.PickAndPlaceSkillType_ReadyToHalted_TransitionNumber, CompositeSkills.Namespaces.CompositeSkills);
 
         /// <summary>
+        /// The identifier for the PickAndPlaceSkillType_SkillStep Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId PickAndPlaceSkillType_SkillStep = new ExpandedNodeId(CompositeSkills.Variables.PickAndPlaceSkillType_SkillStep, CompositeSkills.Namespaces.CompositeSkills);
+
+        /// <summary>
         /// The identifier for the PickAndPlaceSkillType_ParameterSet_ObjectId Variable.
         /// </summary>
         public static readonly ExpandedNodeId PickAndPlaceSkillType_ParameterSet_ObjectId = new ExpandedNodeId(CompositeSkills.Variables.PickAndPlaceSkillType_ParameterSet_ObjectId, CompositeSkills.Namespaces.CompositeSkills);
@@ -1568,6 +1583,11 @@ namespace CompositeSkills
         public static readonly ExpandedNodeId CompositeSkills_Skills_PickAndPlaceSkill_MaxInstanceCount = new ExpandedNodeId(CompositeSkills.Variables.CompositeSkills_Skills_PickAndPlaceSkill_MaxInstanceCount, CompositeSkills.Namespaces.CompositeSkills);
 
         /// <summary>
+        /// The identifier for the CompositeSkills_Skills_PickAndPlaceSkill_SkillStep Variable.
+        /// </summary>
+        public static readonly ExpandedNodeId CompositeSkills_Skills_PickAndPlaceSkill_SkillStep = new ExpandedNodeId(CompositeSkills.Variables.CompositeSkills_Skills_PickAndPlaceSkill_SkillStep, CompositeSkills.Namespaces.CompositeSkills);
+
+        /// <summary>
         /// The identifier for the CompositeSkills_Skills_PickAndPlaceSkill_ParameterSet_ObjectId Variable.
         /// </summary>
         public static readonly ExpandedNodeId CompositeSkills_Skills_PickAndPlaceSkill_ParameterSet_ObjectId = new ExpandedNodeId(CompositeSkills.Variables.CompositeSkills_Skills_PickAndPlaceSkill_ParameterSet_ObjectId, CompositeSkills.Namespaces.CompositeSkills);
@@ -1650,6 +1670,11 @@ namespace CompositeSkills
         /// The BrowseName for the PickAndPlaceSkillType component.
         /// </summary>
         public const string PickAndPlaceSkillType = "PickAndPlaceSkill";
+
+        /// <summary>
+        /// The BrowseName for the SkillStep component.
+        /// </summary>
+        public const string SkillStep = "SkillStep";
     }
     #endregion
 

@@ -318,11 +318,14 @@
             <Children>
               <Object SymbolicName="DEVICE:Skills" TypeDefinition="ua:BaseObjectType" ModellingRule="Mandatory">
                 <Children>
-                  <Object SymbolicName="ROB_UR:JointLinearMoveSkill" TypeDefinition="FOR_ROB:JointLinearMoveSkillType" ModellingRule="Mandatory">
+                  <Object SymbolicName="ROB_UR:JointLinearMoveSkill" TypeDefinition="FOR_ROB:JointLinearMoveSkillType" ModellingRule="Mandatory"
+                          SupportsEvents="true">
                   </Object>
-                  <Object SymbolicName="ROB_UR:JointPtpMoveSkill" TypeDefinition="FOR_ROB:JointPtpMoveSkillType" ModellingRule="Mandatory">
+                  <Object SymbolicName="ROB_UR:JointPtpMoveSkill" TypeDefinition="FOR_ROB:JointPtpMoveSkillType" ModellingRule="Mandatory"
+                          SupportsEvents="true">
                   </Object>
-                  <Object SymbolicName="ROB_UR:CartesianLinearMoveSkill" TypeDefinition="FOR_ROB:CartesianLinearMoveSkillType" ModellingRule="Mandatory">
+                  <Object SymbolicName="ROB_UR:CartesianLinearMoveSkill" TypeDefinition="FOR_ROB:CartesianLinearMoveSkillType" ModellingRule="Mandatory"
+                          SupportsEvents="true">
                     <Children>
                       <Object SymbolicName="DI:ParameterSet" ModellingRule="Mandatory">
                         <Children>
@@ -334,7 +337,8 @@
                       </Object>
                     </Children>
                   </Object>
-                  <Object SymbolicName="ROB_UR:CartesianPtpMoveSkill" TypeDefinition="FOR_ROB:CartesianPtpMoveSkillType" ModellingRule="Mandatory">
+                  <Object SymbolicName="ROB_UR:CartesianPtpMoveSkill" TypeDefinition="FOR_ROB:CartesianPtpMoveSkillType" ModellingRule="Mandatory"
+                          SupportsEvents="true">
                     <Children>
                       <Object SymbolicName="DI:ParameterSet" ModellingRule="Mandatory">
                         <Children>

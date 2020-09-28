@@ -1,11 +1,15 @@
-//
-// Created by profanter on 13/01/2020.
-// Copyright (c) 2020 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #ifndef DATA_BACKBONE_PNPSEMANTICMES_H
 #define DATA_BACKBONE_PNPSEMANTICMES_H
 
+#include <types_fortiss_device_generated.h>
 #include "SemanticMes.h"
 
 class PnpSemanticMes : public SemanticMes {
@@ -13,13 +17,15 @@ class PnpSemanticMes : public SemanticMes {
 public:
     explicit PnpSemanticMes(
             std::shared_ptr<spdlog::logger> _logger,
-            UA_Server* server,
+            std::shared_ptr<spdlog::logger> _loggerOpcua,
+            const std::shared_ptr<fortiss::opcua::OpcUaServer>& server,
             const std::string& clientCertPath,
             const std::string& clientKeyPath,
-            const libconfig::Setting& pnpSetting
+            const libconfig::Setting& pnpSetting,
+            bool isSimulation
     );
 
-    virtual ~PnpSemanticMes();
+    ~PnpSemanticMes() override;
 
     UA_StatusCode startDemoExecution();
 
@@ -30,6 +36,9 @@ public:
 
 private:
     const libconfig::Setting& pnpSetting;
+    bool isSimulation;
+
+    std::map<std::string, rl::math::Transform> objectPositions;
 
     UA_StatusCode takeToolAtPosition(
             const UA_ThreeDFrame* toolPosition,

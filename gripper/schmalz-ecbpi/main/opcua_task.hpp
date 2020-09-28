@@ -1,7 +1,10 @@
-//
-// Created by profanter on 21/01/2020.
-// Copyright (c) 2020 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #ifndef SCHMALZ_ECBPI_OPCUA_TASK_HPP
 #define SCHMALZ_ECBPI_OPCUA_TASK_HPP
@@ -9,7 +12,9 @@
 #ifdef UA_ENABLE_AMALGAMATION
 #include <open62541.h>
 #else
+
 #include <open62541/server_config_default.h>
+
 #endif
 
 
@@ -25,28 +30,33 @@
 
 #include "GripperOPCUA.h"
 
-GRIPPER_CLASS *ioLinkGripper = NULL;
+GRIPPER_CLASS* ioLinkGripper = NULL;
 
 #define fortiss_LDS_URI "fortiss.component.mes"
 
 std::shared_ptr<spdlog::logger> logger;
 
 #ifndef LOCAL_SIMULATION
+#include <esp_log.h>
+#include "TinyPico.h"
 static const char *TAG_OPC = "OPC UA";
 TinyPICO *tinyPico;
 #endif
 
 static bool
-createNodesFromNodeset(UA_Server *server) {
-    if (namespace_di_generated(server) != UA_STATUSCODE_GOOD) {
+createNodesFromNodeset(
+        const std::shared_ptr<fortiss::opcua::OpcUaServer>& server
+) {
+    LockedServer ls = server->getLocked();
+    if (namespace_di_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the DI namespace failed. Please check previous error output.");
         return false;
     }
-    if (namespace_fortiss_device_generated(server) != UA_STATUSCODE_GOOD) {
+    if (namespace_fortiss_device_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the fortiss device namespace failed. Please check previous error output.");
         return false;
     }
-    if (namespace_schmalz_ecbpi_generated(server) != UA_STATUSCODE_GOOD) {
+    if (namespace_schmalz_ecbpi_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the Sommer Automatic namespace failed. Please check previous error output.");
         return false;
     }
@@ -54,21 +64,43 @@ createNodesFromNodeset(UA_Server *server) {
 }
 
 
-static bool run_opcua(UA_UInt16 port, volatile bool *running, bool ignore_poweroff) {
+static bool run_opcua(
+        UA_UInt16 port,
+        volatile bool* running,
+        bool ignore_poweroff,
+        std::shared_ptr<spdlog::logger> _logger = nullptr,
+        std::shared_ptr<spdlog::logger> _loggerServer = nullptr,
+        std::shared_ptr<spdlog::logger> _loggerClient = nullptr
+) {
 
     //The default 64KB of memory for sending and receicing buffer caused problems to many users. With the code below, they are reduced to ~16KB
     UA_UInt32 sendBufferSize = 16000;       //64 KB was too much for my platform
     UA_UInt32 recvBufferSize = 16000;       //64 KB was too much for my platform
 
-    logger = fortiss::log::get("gripper/schmalz-ecpbi");
-    logger->set_level(spdlog::level::level_enum::debug);
+    std::shared_ptr<spdlog::logger> loggerServer;
+    std::shared_ptr<spdlog::logger> loggerClient;
+    if (!logger) {
+        logger = fortiss::log::get("main");
+        logger->set_level(spdlog::level::level_enum::info);
+        loggerServer = logger->clone(logger->name() + "-ua");
+        loggerServer->set_level(spdlog::level::level_enum::warn);
+        loggerClient = logger->clone(logger->name() + "-ua-reg");
+        loggerClient->set_level(spdlog::level::level_enum::warn);
+    } else {
+        logger = _logger;
+        loggerServer = _loggerServer;
+        loggerClient = _loggerClient;
+    }
 
-
-    UA_ServerConfig uaServerConfig;
+    UA_ServerConfig *uaServerConfig = (UA_ServerConfig*) UA_malloc(sizeof(UA_ServerConfig));
+    if (!uaServerConfig) {
+        logger->error("Can not create server config");
+        throw std::runtime_error("Cannot create server config");
+    }
     // ------------- OPC UA initialization -------------------
     if (fortiss::opcua::initServerConfig(
-            logger,
-            &uaServerConfig,
+            loggerServer,
+            uaServerConfig,
             "fortiss.component.gripper.schmalz.ecbpi",
             "fortiss - Gripper - Schmalz - ECBPi",
             (UA_UInt16) ((int) port),
@@ -81,34 +113,44 @@ static bool run_opcua(UA_UInt16 port, volatile bool *running, bool ignore_powero
         return false;
     }
 
-    #ifndef LOCAL_SIMULATION
-        #ifndef CONFIG_ETHERNET_HELPER_CUSTOM_HOSTNAME
-        #ifndef ETHERNET_HELPER_STATIC_IP4
-        #error You need to set a static IP or a custom hostname with menuconfig
-        #else
-        UA_String str = UA_STRING(CONFIG_ETHERNET_HELPER_STATIC_IP4_ADDRESS);
-        #endif
-        #else
-        UA_String str = UA_STRING((char*)CONFIG_ETHERNET_HELPER_CUSTOM_HOSTNAME_STR);
-        #endif
-        UA_ServerConfig_setCustomHostname(&uaServerConfig, str);
 
-        tcpip_adapter_ip_info_t default_ip;
-        esp_err_t ret = tcpip_adapter_get_ip_info(tcpip_adapter_if_t::TCPIP_ADAPTER_IF_STA, &default_ip);
-        if ((ESP_OK == ret) && (default_ip.ip.addr != INADDR_ANY)) {
-            uaServerConfig.discovery.ipAddressListSize = 1;
-            uaServerConfig.discovery.ipAddressList = (uint32_t *)UA_malloc(sizeof(uint32_t)*uaServerConfig.discovery.ipAddressListSize);
-            memcpy(uaServerConfig.discovery.ipAddressList, &default_ip.ip.addr, sizeof(uint32_t));
-        } else {
-            ESP_LOGI(TAG_OPC, "Could not get default IP Address!");
-        }
+    #ifndef LOCAL_SIMULATION
+    #ifndef CONFIG_ETHERNET_HELPER_CUSTOM_HOSTNAME
+    #ifndef ETHERNET_HELPER_STATIC_IP4
+    #error You need to set a static IP or a custom hostname with menuconfig
+    #else
+    UA_String str = UA_STRING(CONFIG_ETHERNET_HELPER_STATIC_IP4_ADDRESS);
+    #endif
+    #else
+    UA_String str = UA_STRING((char*)CONFIG_ETHERNET_HELPER_CUSTOM_HOSTNAME_STR);
+    #endif
+    UA_String_clear(&uaServerConfig->customHostname);
+    UA_String_copy(&str, &uaServerConfig->customHostname);
+
+    tcpip_adapter_ip_info_t default_ip;
+    esp_err_t ret = tcpip_adapter_get_ip_info(tcpip_adapter_if_t::TCPIP_ADAPTER_IF_STA, &default_ip);
+    if ((ESP_OK == ret) && (default_ip.ip.addr != INADDR_ANY)) {
+        uaServerConfig->mdnsIpAddressListSize = 1;
+        uaServerConfig->mdnsIpAddressList = (uint32_t *)UA_malloc(sizeof(uint32_t)*uaServerConfig->mdnsIpAddressListSize);
+        memcpy(uaServerConfig->mdnsIpAddressList, &default_ip.ip.addr, sizeof(uint32_t));
+    } else {
+        ESP_LOGI(TAG_OPC, "Could not get default IP Address!");
+    }
     #endif
 
-    UA_Server *server = UA_Server_newWithConfig(&uaServerConfig);
-    if (!server) {
-        logger->error("Can not create server instance");
-        return false;
-    }
+
+    std::shared_ptr<fortiss::opcua::OpcUaServer> server = std::make_shared<fortiss::opcua::OpcUaServer>(
+            logger,
+            loggerServer,
+            loggerClient,
+            "fortiss.component.gripper.schmalz.ecbpi.client",
+            "fortiss - Gripper - Schmalz - ECBPi - Client",
+            "",
+            std::string(fortiss_LDS_URI),
+            uaServerConfig);
+
+    // Default is 100ms. We support 20ms here as fastest publishing interval
+    server->getServerConfig()->publishingIntervalLimits.min = 20;
 
     if (!createNodesFromNodeset(server)) {
         throw std::runtime_error("Creating nodes from nodeset failed");
@@ -116,45 +158,12 @@ static bool run_opcua(UA_UInt16 port, volatile bool *running, bool ignore_powero
 
     GripperOPCUA gripperOPCUA(logger, server, ioLinkGripper);
 
-    UA_StatusCode retval = UA_Server_run_startup(server);
-    if (retval != UA_STATUSCODE_GOOD) {
+    if (const UA_StatusCode retval = server->init(
+            true
+    ) != UA_STATUSCODE_GOOD) {
         logger->error("Starting up the server failed with " + std::string(UA_StatusCode_name(retval)));
         return false;
     }
-
-
-    std::shared_ptr<spdlog::logger> loggerClient = logger->clone(logger->name()+"-reg");
-    if (loggerClient->level() < spdlog::level::warn)
-        loggerClient->set_level(spdlog::level::warn);
-
-    UA_Client *clientRegister = NULL;
-    UA_UInt64 periodicCallbackId = 0;
-    const fortiss::opcua::serverOnNetworkCallbackData onLdsData = {
-            .filterServerName = std::string(fortiss_LDS_URI),
-            .callbackOnAnnounceOnly = true,
-            .onServerAnnounce = [server, &periodicCallbackId, &clientRegister, &loggerClient](const UA_ServerOnNetwork *serverOnNetwork, UA_Boolean isServerAnnounce) {
-                logger->info("Found LDS Server on {}", std::string((char*)serverOnNetwork->discoveryUrl.data,  serverOnNetwork->discoveryUrl.length));
-                if (periodicCallbackId != 0)
-                    UA_Server_removeCallback(server, periodicCallbackId);
-                if (clientRegister) {
-                    UA_Client_disconnect(clientRegister);
-                    UA_Client_delete(clientRegister);
-                }
-
-                fortiss::opcua::UA_Server_setPeriodicRegister(
-                        server,
-                        loggerClient,
-                        "",
-                        "",
-                        "fortiss.component.gripper.schmalz.ecbpi.client",
-                        "fortiss - Gripper - Schmalz - ECBPi - Client",
-                        serverOnNetwork,
-                        &periodicCallbackId,
-                        &clientRegister);
-            }
-    };
-    fortiss::opcua::UA_Server_onServerAnnounce(server, onLdsData);
-
 
     const fortiss::opcua::powerOffDeviceCallbackData onPowerOffDeviceData = {
             .logger = logger,
@@ -165,12 +174,15 @@ static bool run_opcua(UA_UInt16 port, volatile bool *running, bool ignore_powero
                 return UA_STATUSCODE_GOOD;
             }
     };
-    retval = fortiss::opcua::setPowerOffHandler(server, UA_NODEID_NUMERIC(
-            fortiss::opcua::UA_Server_getNamespaceIdByName(server, NAMESPACE_URI_SCHMALZ),
-            UA_SCHMALZ_ECBPIID_SCHMALZECBPI), onPowerOffDeviceData);
-    if (retval != UA_STATUSCODE_GOOD) {
-        logger->error("Adding PowerOffHandler failed: " + std::string(UA_StatusCode_name(retval)));
-        return false;
+    {
+        LockedServer ls = server->getLocked();
+        UA_StatusCode retval = fortiss::opcua::setPowerOffHandler(ls.get(), UA_NODEID_NUMERIC(
+                fortiss::opcua::UA_Server_getNamespaceIdByName(server, NAMESPACE_URI_SCHMALZ),
+                UA_SCHMALZ_ECBPIID_SCHMALZECBPI), onPowerOffDeviceData);
+        if (retval != UA_STATUSCODE_GOOD) {
+            logger->error("Adding PowerOffHandler failed: " + std::string(UA_StatusCode_name(retval)));
+            return false;
+        }
     }
 
     if (!gripperOPCUA.connect()) {
@@ -182,26 +194,33 @@ static bool run_opcua(UA_UInt16 port, volatile bool *running, bool ignore_powero
     #ifndef LOCAL_SIMULATION
     ESP_LOGI(TAG_OPC, "Starting server loop. Free Heap: %d bytes", xPortGetFreeHeapSize());
     tinyPico->DotStar_SetPixelColor(0, 255, 0);
+
+    gripperOPCUA.startStepperTask();
     #endif
 
     while (*running) {
-        UA_Server_run_iterate(server, false);
-        if (!gripperOPCUA.step())
-            return false;
+        server->iterate();
         #ifndef LOCAL_SIMULATION
         ESP_ERROR_CHECK(esp_task_wdt_reset());
+        vTaskDelay(pdMS_TO_TICKS(10));
         #else
+        gripperOPCUA.step();
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         #endif
-        std::this_thread::yield();
+        //std::this_thread::yield();
     }
     // do one last iteration
-    UA_Server_run_iterate(server, true);
+    server->iterate(true);
+    #ifndef LOCAL_SIMULATION
+    gripperOPCUA.stopStepperTask(true);
+    #else
     gripperOPCUA.step();
-    UA_Server_run_shutdown(server);
+    gripperOPCUA.shutdown();
+    #endif
 
-    UA_Server_delete(server);
+    server.reset();
 
+    spdlog::shutdown();
     return true;
 }
 

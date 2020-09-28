@@ -1,7 +1,10 @@
-//
-// Created by profanter on 12/11/18.
-// Copyright (c) 2018 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #ifndef ROBOTICS_UNIVERSALROBOTCONTROL_H
 #define ROBOTICS_UNIVERSALROBOTCONTROL_H
@@ -21,7 +24,7 @@ static constexpr unsigned int AXIS_COUNT = 6;
 
 namespace fortiss {
     namespace robot {
-    class UniversalRobotControl : public fortiss::opcua::robot::RlRobotControl<AXIS_COUNT> {
+        class UniversalRobotControl : public fortiss::opcua::robot::RlRobotControl<AXIS_COUNT> {
 
         private:
             const UA_UInt16 nsIdRobUr;
@@ -35,23 +38,49 @@ namespace fortiss {
 
             //void recoverFromSafetyStop();
 
-            rl::hal::UniversalRobotsRtde::RobotMode currentRobotMode = rl::hal::UniversalRobotsRtde::RobotMode::ROBOT_MODE_BOOTING;
-            rl::hal::UniversalRobotsRtde::SafetyMode currentSafetyMode = rl::hal::UniversalRobotsRtde::SafetyMode::SAFETY_MODE_FAULT;
-            rl::hal::UniversalRobotsRtde::RuntimeState currentRuntimeState = rl::hal::UniversalRobotsRtde::RuntimeState::RUNTIME_STATE_STOPPED;
+            rl::hal::UniversalRobotsRtde::RobotMode currentRobotMode = rl::hal::UniversalRobotsRtde::RobotMode::booting;
+            rl::hal::UniversalRobotsRtde::SafetyMode currentSafetyMode = rl::hal::UniversalRobotsRtde::SafetyMode::fault;
+            rl::hal::UniversalRobotsRtde::RuntimeState currentRuntimeState = rl::hal::UniversalRobotsRtde::RuntimeState::stopped;
 
 
 //            void updateControlLoop();
 
-            bool setVariableDouble(const UA_NodeId& id, const std::string& name, const UA_Double& val);
-            bool setVariableInt32(const UA_NodeId& id, const std::string& name, const UA_Int32& val);
-            bool setVariable3DFrame(const UA_NodeId& id, const std::string& name, const rl::math::Transform& val);
-            bool setVariable3DVector(const UA_NodeId& id, const std::string& name, const rl::math::MotionVector& val);
-            bool setVariable3DVector(const UA_NodeId& id, const std::string& name, const rl::math::ForceVector& val);
+            bool setVariableDouble(
+                    const UA_NodeId& id,
+                    const std::string& name,
+                    const UA_Double& val
+            );
+
+            bool setVariableInt32(
+                    const UA_NodeId& id,
+                    const std::string& name,
+                    const UA_Int32& val
+            );
+
+            bool setVariable3DFrame(
+                    const UA_NodeId& id,
+                    const std::string& name,
+                    const rl::math::Transform& val
+            );
+
+            bool setVariable3DVector(
+                    const UA_NodeId& id,
+                    const std::string& name,
+                    const rl::math::MotionVector& val
+            );
+
+            bool setVariable3DVector(
+                    const UA_NodeId& id,
+                    const std::string& name,
+                    const rl::math::ForceVector& val
+            );
 
         public:
 
-            explicit UniversalRobotControl(const libconfig::Setting &robotSettings,
-                                           UA_Server *uaServer);
+            explicit UniversalRobotControl(
+                    const libconfig::Setting& robotSettings,
+                    const std::shared_ptr<fortiss::opcua::OpcUaServer>& server
+            );
 
             bool step() override;
 
@@ -60,6 +89,7 @@ namespace fortiss {
 //            virtual bool step() override;
 
             bool connect() override;
+
             void shutdown() override;
 
 

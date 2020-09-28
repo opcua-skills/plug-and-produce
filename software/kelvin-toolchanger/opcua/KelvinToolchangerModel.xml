@@ -91,8 +91,10 @@
       <Object SymbolicName="DEVICE:Skills" TypeDefinition="OpcUa:BaseObjectType" ModellingRule="Mandatory">
         <Description>Contains the skills of the semantic MES</Description>
         <Children>
-          <Object SymbolicName="KELVIN_TOOLCHANGER:ChangeToolSkill" TypeDefinition="KELVIN_TOOLCHANGER:ChangeToolSkillType" ModellingRule="Mandatory" />
-          <Object SymbolicName="KELVIN_TOOLCHANGER:DropToolSkill" TypeDefinition="KELVIN_TOOLCHANGER:DropToolSkillType" ModellingRule="Mandatory" />
+          <Object SymbolicName="KELVIN_TOOLCHANGER:ChangeToolSkill" TypeDefinition="KELVIN_TOOLCHANGER:ChangeToolSkillType" ModellingRule="Mandatory"
+                  SupportsEvents="true"/>
+          <Object SymbolicName="KELVIN_TOOLCHANGER:DropToolSkill" TypeDefinition="KELVIN_TOOLCHANGER:DropToolSkillType" ModellingRule="Mandatory"
+                  SupportsEvents="true"/>
         </Children>
       </Object>
       <Variable SymbolicName="KELVIN_TOOLCHANGER:HasTool" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:Boolean" ModellingRule="Mandatory" ValueRank="Scalar" AccessLevel="Read">

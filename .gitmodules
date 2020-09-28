@@ -2,14 +2,6 @@
 	path = gripper/robotiq-2f/main/deps/common
 	url = https://github.com/opcua-skills/skills-common.git
 	branch = master
-[submodule "gripper/robotiq-2f/components/open62541/repo"]
-	path = gripper/robotiq-2f/components/open62541/repo
-	url = https://github.com/open62541/open62541.git
-	branch = master
-[submodule "gripper/schmalz-ecbpi/components/open62541/repo"]
-	path = gripper/schmalz-ecbpi/components/open62541/repo
-	url = https://github.com/open62541/open62541.git
-	branch = master
 [submodule "gripper/schmalz-ecbpi/main/deps/common"]
 	path = gripper/schmalz-ecbpi/main/deps/common
 	url = https://github.com/opcua-skills/skills-common.git
@@ -29,4 +21,12 @@
 [submodule "software/semantic-mes/deps/common"]
 	path = software/semantic-mes/deps/common
 	url = https://github.com/opcua-skills/skills-common.git
+	branch = master
+[submodule "gripper/schmalz-ecbpi/components/open62541/repo"]
+	path = gripper/schmalz-ecbpi/components/open62541/repo
+	url = https://github.com/open62541/open62541.git
+	branch = master
+[submodule "gripper/robotiq-2f/components/open62541/repo"]
+	path = gripper/robotiq-2f/components/open62541/repo
+	url = https://github.com/open62541/open62541.git
 	branch = master

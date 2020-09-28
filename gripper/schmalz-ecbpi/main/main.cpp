@@ -1,11 +1,10 @@
-/* Hello World Example
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #include <esp_wifi.h>
 #include <esp_event.h>
@@ -22,7 +21,7 @@
 #include "driver/uart.h"
 #include "esp_log.h"
 
-#include "tcpip_adapter.h"
+#include "esp_netif.h"
 #include "ethernet_helper.h"
 
 #include "TinyPico.h"
@@ -48,6 +47,7 @@
 #include <esp_task_wdt.h>
 #include <esp_sntp.h>
 #include <iolma_ll_hsal_esp32.h>
+#include <iolma_ll_hsal.h>
 #include <iolma_hl_srvl.h>
 #include <esp_sleep.h>
 
@@ -65,7 +65,9 @@ static bool serverCreated = false;
 
 #define IOLMA_DEMOAPP_CLIENT_ID     0u      /*!< ID of the client who will use the IOLMA HL services */
 #define IOLMA_HL_DEMOAPP_PRINTF(...) ESP_LOGI(TAG_IO, __VA_ARGS__)
-#define COMM_TASK_PRIORITY 20
+#define COMM_TASK_PRIORITY ESP_TASK_PRIO_MAX
+//ESP_TASK_TCPIP_PRIO + 1
+#define OPCUA_TASK_PRIORITY ESP_TASK_MAIN_PRIO
 
 /* Variable holding number of times ESP32 restarted since first boot.
  * It is placed into RTC memory using RTC_DATA_ATTR and
@@ -110,7 +112,7 @@ static void opcua_task(void *arg) {
     ESP_ERROR_CHECK(esp_task_wdt_delete(NULL));
 
     while (true) {
-        std::this_thread::yield();
+        sleep(100000);
     }
     esp_deep_sleep_start();
 }
@@ -184,7 +186,7 @@ static void connect_handler(void* arg, esp_event_base_t event_base,
     tinyPico->DotStar_SetPixelColor(255, 255, 0);
     if (!serverCreated) {
         ESP_LOGI(TAG, "Starting OPC UA Task");
-        xTaskCreate(opcua_task, "opcua_task", 32768, NULL, 5, NULL);
+        xTaskCreate(opcua_task, "opcua_task", 26624, NULL, OPCUA_TASK_PRIORITY, NULL);
         serverCreated = true;
     }
 }
@@ -194,7 +196,7 @@ static void port_event_callback(uint8_t iol_port, s_iolma_event_t s_occurred_eve
 {
     (void)iol_port;
     (void)s_occurred_event;
-    printf("Port event occurred on port %d", iol_port);        /* normally, code like this should not appear in this callback... this printf is just for demo purposes */
+    //printf("Port event occurred on port %d", iol_port);
 } /* port_event_callback */
 
 
@@ -203,7 +205,10 @@ static void device_event_callback(uint8_t iol_port, s_iolma_event_t s_occurred_e
 {
     (void)s_occurred_event;
     iolma_hl_srvl_device_event_rsp(IOLMA_DEMOAPP_CLIENT_ID, iol_port);
-    printf("Device event occurred on port %d", iol_port);     /* normally, code like this should not appear in this callback... this printf is just for demo purposes */
+
+    //ioLinkGripper->pushEvent(s_occurred_event);
+    //printf("Device event occurred on port %d", iol_port);
+    // /* normally, code like this should not appear in this callback... this printf is just for demo purposes */
 } /* device_event_callback */
 
 
@@ -242,16 +247,23 @@ bool initIolink() {
     p_s_comm_peripheral_config = &s_comm_uart_config;
     e_comm_peripheral = E_IOLMA_PERIPHERAL_UART;
 
-    comm_cycle_time_in_ten_us = 1000;
+    comm_cycle_time_in_ten_us = 370;
     e_b_comm_interleaved = E_IOLMA_BOOL_FALSE;
 
-    static uint8_t standard_comm_task_buffer[1u];           /* dummy */
-    static uint8_t interleaved_comm_task_buffer[1u];        /* dummy */
+    static uint8_t standard_comm_task_buffer[IOLMA_REQUEST_AND_RESPONSE_MAX_LENGTH];
+    static uint8_t interleaved_comm_task_buffer[IOLMA_REQUEST_AND_RESPONSE_MAX_LENGTH];
+
+    if (iolma_ll_hsal_timer_configure(NULL) != E_IOLMA_RET_OK) {
+        IOLMA_HL_DEMOAPP_PRINTF("Failed to initialize the High-Level Timer...");
+        return false;
+    }
 
     IOLMA_HL_DEMOAPP_PRINTF("Initializing the High-Level IO-Link Master Access service layer... ");
-    if(iolma_hl_srvl_init(IOLMA_DEMOAPP_CLIENT_ID, standard_comm_task_buffer, sizeof(standard_comm_task_buffer), interleaved_comm_task_buffer, sizeof(interleaved_comm_task_buffer), master_com_lost_callback, device_event_callback, port_event_callback) != E_IOLMA_RET_OK)
+    E_IOLMA_RET_t ret = iolma_hl_srvl_init(IOLMA_DEMOAPP_CLIENT_ID, standard_comm_task_buffer, sizeof(standard_comm_task_buffer),
+            interleaved_comm_task_buffer, sizeof(interleaved_comm_task_buffer), master_com_lost_callback, device_event_callback, port_event_callback);
+    if(ret != E_IOLMA_RET_OK)
     {
-        IOLMA_HL_DEMOAPP_PRINTF("Failed to initialize the High-Level IO-Link Master Access service layer...");
+        IOLMA_HL_DEMOAPP_PRINTF("Failed to initialize the High-Level IO-Link Master Access service layer: %d", ret);
         return false;
     }
 
@@ -332,7 +344,7 @@ void app_main(void)
     //static UA_Server *server = NULL;
 
     ESP_ERROR_CHECK(nvs_flash_init());
-    tcpip_adapter_init();
+    esp_netif_init();
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
 
@@ -341,7 +353,7 @@ void app_main(void)
     tinyPico->DotStar_SetPixelColor(0, 0, 128);
 
 
-    ESP_ERROR_CHECK(esp_task_wdt_init(10, true));
+    ESP_ERROR_CHECK(esp_task_wdt_init(30, true));
     // Remove idle tasks from watchdog
     ESP_ERROR_CHECK(esp_task_wdt_delete(xTaskGetIdleTaskHandleForCPU(0)));
     ESP_ERROR_CHECK(esp_task_wdt_delete(xTaskGetIdleTaskHandleForCPU(1)));

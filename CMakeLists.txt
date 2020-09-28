@@ -22,7 +22,7 @@ set(LOCAL_SIMULATION ON)
 add_subdirectory(gripper/schmalz-ecbpi)
 add_subdirectory(gripper/robotiq-2f)
 
-find_package(open62541 1 REQUIRED COMPONENTS FullNamespace)
+find_package(open62541 1 REQUIRED COMPONENTS FullNamespace Discovery DiscoveryMulticast)
 
 enable_testing()
 

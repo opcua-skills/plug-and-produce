@@ -94,7 +94,7 @@ namespace CompositeSkills
         private const string InitializationString =
            "AwAAACcAAABodHRwczovL2ZvcnRpc3Mub3JnL1VBL0NvbXBvc2l0ZVNraWxscy8fAAAAaHR0cDovL29w" +
            "Y2ZvdW5kYXRpb24ub3JnL1VBL0RJLx4AAABodHRwczovL2ZvcnRpc3Mub3JnL1VBL0RldmljZS//////" +
-           "BGCAAgEAAAABAB0AAABQaWNrQW5kUGxhY2VTa2lsbFR5cGVJbnN0YW5jZQEBmToBAZk6mToAAP////8M" +
+           "BGCAAgEAAAABAB0AAABQaWNrQW5kUGxhY2VTa2lsbFR5cGVJbnN0YW5jZQEBmToBAZk6mToAAP////8N" +
            "AAAAFWCJCgIAAAAAAAwAAABDdXJyZW50U3RhdGUBAZo6AC8BAMgKmjoAAAAV/////wEB/////wIAAAAV" +
            "YIkKAgAAAAAAAgAAAElkAQGbOgAuAESbOgAAABH/////AQH/////AAAAABVgiQoCAAAAAAAGAAAATnVt" +
            "YmVyAQGdOgAuAESdOgAAAAf/////AQH/////AAAAABVgiQoCAAAAAAAOAAAATGFzdFRyYW5zaXRpb24B" +
@@ -109,28 +109,50 @@ namespace CompositeSkills
            "AQEAAAAANQEBAcw6AAAAAARhggoEAAAAAAAGAAAAUmVzdW1lAQHYOgAvAQB8Cdg6AAABAQEAAAAANQEB" +
            "Ac46AAAAAARhggoEAAAAAAAEAAAASGFsdAEB2ToALwEAfQnZOgAAAQEDAAAAADUBAQHIOgA1AQEB0DoA" +
            "NQEBAdQ6AAAAAARhggoEAAAAAAAFAAAAUmVzZXQBAdo6AC8BAH4J2joAAAEBAQAAAAA1AQEBxDoAAAAA" +
-           "BGCACgEAAAACAAwAAABQYXJhbWV0ZXJTZXQBAdw6AC8AOtw6AAD/////BAAAADVgiQoCAAAAAQAIAAAA" +
-           "T2JqZWN0SWQBAd06AwAAAAAoAAAASWQgb2YgdGhlIG9iamVjdCB3aGljaCBzaG91bGQgYmUgcGlja2Vk" +
-           "LgAvAD/dOgAAAAz/////AwP/////AAAAADVgiQoCAAAAAQAbAAAAVG9vbFNraWxsQ29udHJvbGxlckVu" +
-           "ZHBvaW50AQHeOgMAAAAAUwAAAFRoZSBlbmRwb2ludCBVUkwgb2YgdGhlIGdyaXBwZXIgdG9vbCBjb250" +
-           "cm9sbGVyIHdoaWNoIHNob3VsZCBiZSB1c2VkIGZvciB0aGlzIHNraWxsAC8AP946AAAADP////8DA///" +
-           "//8AAAAANWCJCgIAAAABABsAAABNb3ZlU2tpbGxDb250cm9sbGVyRW5kcG9pbnQBAd86AwAAAABLAAAA" +
-           "VGhlIGVuZHBvaW50IFVSTCBvZiB0aGUgbW92ZSBjb250cm9sbGVyIHdoaWNoIHNob3VsZCBiZSB1c2Vk" +
-           "IGZvciB0aGlzIHNraWxsAC8AP986AAAADP////8DA/////8AAAAANWCJCgIAAAABAA0AAABQbGFjZVBv" +
-           "c2l0aW9uAQHgOgMAAAAAVAAAAFBvc2l0aW9uIHdoZXJlIHRoZSBvYmplY3Qgc2hvdWxkIGJlIHBsYWNl" +
-           "ZCwgYmFzZWQgb24gdGhlIHdvcmxkIGZyYW1lIHRvIG9iamVjdCBmcmFtZQAvAQBnSeA6AAABAH5J////" +
-           "/wMD/////wIAAAAVYIkKAgAAAAAAFAAAAENhcnRlc2lhbkNvb3JkaW5hdGVzAQHhOgAvAQBWSeE6AAAB" +
-           "AHpJ/////wEB/////wMAAAAVYIkKAgAAAAAAAQAAAFgBAeg6AC8AP+g6AAAAC/////8BAf////8AAAAA" +
-           "FWCJCgIAAAAAAAEAAABZAQHpOgAvAD/pOgAAAAv/////AQH/////AAAAABVgiQoCAAAAAAABAAAAWgEB" +
-           "6joALwA/6joAAAAL/////wEB/////wAAAAAVYIkKAgAAAAAACwAAAE9yaWVudGF0aW9uAQHjOgAvAQBd" +
-           "SeM6AAABAHxJ/////wEB/////wMAAAAVYIkKAgAAAAAAAQAAAEEBAes6AC8AP+s6AAAAC/////8BAf//" +
-           "//8AAAAAFWCJCgIAAAAAAAEAAABCAQHsOgAvAD/sOgAAAAv/////AQH/////AAAAABVgiQoCAAAAAAAB" +
-           "AAAAQwEB7ToALwA/7ToAAAAL/////wEB/////wAAAAA=";
+           "NWCJCgIAAAABAAkAAABTa2lsbFN0ZXABAbI7AwAAAABeAAAAVGhlIGN1cnJlbnQgZXhlY3V0ZWQgc3Rl" +
+           "cCByZXByZXNlbnRlZCBhcyBzdHJpbmcuIEkuZS4sIFBpY2stQXBwcm9hY2gsIFBpY2stVXAsIE1vdmUt" +
+           "UGxhY2UsIC4uLgAvAD+yOwAAAAz/////AQH/////AAAAAARggAoBAAAAAgAMAAAAUGFyYW1ldGVyU2V0" +
+           "AQHcOgAvADrcOgAA/////wQAAAA1YIkKAgAAAAEACAAAAE9iamVjdElkAQHdOgMAAAAAKAAAAElkIG9m" +
+           "IHRoZSBvYmplY3Qgd2hpY2ggc2hvdWxkIGJlIHBpY2tlZC4ALwA/3ToAAAAM/////wMD/////wAAAAA1" +
+           "YIkKAgAAAAEAGwAAAFRvb2xTa2lsbENvbnRyb2xsZXJFbmRwb2ludAEB3joDAAAAAFMAAABUaGUgZW5k" +
+           "cG9pbnQgVVJMIG9mIHRoZSBncmlwcGVyIHRvb2wgY29udHJvbGxlciB3aGljaCBzaG91bGQgYmUgdXNl" +
+           "ZCBmb3IgdGhpcyBza2lsbAAvAD/eOgAAAAz/////AwP/////AAAAADVgiQoCAAAAAQAbAAAATW92ZVNr" +
+           "aWxsQ29udHJvbGxlckVuZHBvaW50AQHfOgMAAAAASwAAAFRoZSBlbmRwb2ludCBVUkwgb2YgdGhlIG1v" +
+           "dmUgY29udHJvbGxlciB3aGljaCBzaG91bGQgYmUgdXNlZCBmb3IgdGhpcyBza2lsbAAvAD/fOgAAAAz/" +
+           "////AwP/////AAAAADVgiQoCAAAAAQANAAAAUGxhY2VQb3NpdGlvbgEB4DoDAAAAAFQAAABQb3NpdGlv" +
+           "biB3aGVyZSB0aGUgb2JqZWN0IHNob3VsZCBiZSBwbGFjZWQsIGJhc2VkIG9uIHRoZSB3b3JsZCBmcmFt" +
+           "ZSB0byBvYmplY3QgZnJhbWUALwEAZ0ngOgAAAQB+Sf////8DA/////8CAAAAFWCJCgIAAAAAABQAAABD" +
+           "YXJ0ZXNpYW5Db29yZGluYXRlcwEB4ToALwEAVknhOgAAAQB6Sf////8BAf////8DAAAAFWCJCgIAAAAA" +
+           "AAEAAABYAQHoOgAvAD/oOgAAAAv/////AQH/////AAAAABVgiQoCAAAAAAABAAAAWQEB6ToALwA/6ToA" +
+           "AAAL/////wEB/////wAAAAAVYIkKAgAAAAAAAQAAAFoBAeo6AC8AP+o6AAAAC/////8BAf////8AAAAA" +
+           "FWCJCgIAAAAAAAsAAABPcmllbnRhdGlvbgEB4zoALwEAXUnjOgAAAQB8Sf////8BAf////8DAAAAFWCJ" +
+           "CgIAAAAAAAEAAABBAQHrOgAvAD/rOgAAAAv/////AQH/////AAAAABVgiQoCAAAAAAABAAAAQgEB7DoA" +
+           "LwA/7DoAAAAL/////wEB/////wAAAAAVYIkKAgAAAAAAAQAAAEMBAe06AC8AP+06AAAAC/////8BAf//" +
+           "//8AAAAA";
         #endregion
         #endif
         #endregion
 
         #region Public Properties
+        /// <remarks />
+        public BaseDataVariableState<string> SkillStep
+        {
+            get
+            {
+                return m_skillStep;
+            }
+
+            set
+            {
+                if (!Object.ReferenceEquals(m_skillStep, value))
+                {
+                    ChangeMasks |= NodeStateChangeMasks.Children;
+                }
+
+                m_skillStep = value;
+            }
+        }
+
         /// <remarks />
         public BaseObjectState ParameterSet
         {
@@ -161,6 +183,11 @@ namespace CompositeSkills
             ISystemContext context,
             IList<BaseInstanceState> children)
         {
+            if (m_skillStep != null)
+            {
+                children.Add(m_skillStep);
+            }
+
             if (m_parameterSet != null)
             {
                 children.Add(m_parameterSet);
@@ -187,6 +214,27 @@ namespace CompositeSkills
 
             switch (browseName.Name)
             {
+                case CompositeSkills.BrowseNames.SkillStep:
+                {
+                    if (createOrReplace)
+                    {
+                        if (SkillStep == null)
+                        {
+                            if (replacement == null)
+                            {
+                                SkillStep = new BaseDataVariableState<string>(this);
+                            }
+                            else
+                            {
+                                SkillStep = (BaseDataVariableState<string>)replacement;
+                            }
+                        }
+                    }
+
+                    instance = SkillStep;
+                    break;
+                }
+
                 case Opc.Ua.Di.BrowseNames.ParameterSet:
                 {
                     if (createOrReplace)
@@ -219,6 +267,7 @@ namespace CompositeSkills
         #endregion
 
         #region Private Fields
+        private BaseDataVariableState<string> m_skillStep;
         private BaseObjectState m_parameterSet;
         #endregion
     }

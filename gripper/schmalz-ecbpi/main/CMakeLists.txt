@@ -28,6 +28,7 @@ if(NOT LOCAL_SIMULATION)
                            constants.h
                            TinyPico.cpp
                            ${NODESET_SRCS}
+                           deps/common/server/OpcUaServer.cpp
                            INCLUDE_DIRS "./deps/common/deps/spdlog/include" "./deps/common/include" "${GENERATE_OUTPUT_DIR}" "."
                            PRIV_INCLUDE_DIRS ${IDF_PATH}/components/freertos/include/freertos ${CMAKE_CURRENT_LIST_DIR}/../components/iolink/repo/src/
                            REQUIRES open62541 ethernet_helper nvs_flash esp_adc_cal iolink)
@@ -40,7 +41,10 @@ else()
     find_package(CLI11 CONFIG REQUIRED)
     include_directories($<TARGET_PROPERTY:CLI11::CLI11,INTERFACE_INCLUDE_DIRECTORIES>)
 
+
+    add_subdirectory(deps/common)
     add_executable(schmalz-ecbpi
+                   $<TARGET_OBJECTS:${PROJECT_NAME}-common>
                    main_local.cpp
                    GripperOPCUA.cpp
                    constants.h

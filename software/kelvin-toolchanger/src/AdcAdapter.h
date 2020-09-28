@@ -1,14 +1,17 @@
-//
-// Created by profanter on 19/12/2019.
-// Copyright (c) 2019 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #ifndef KELVIN_TOOLCHANGER_ADCADAPTER_H
 #define KELVIN_TOOLCHANGER_ADCADAPTER_H
 
 #include <functional>
 #include <spdlog/logger.h>
-#include <open62541/client_config.h>
+#include <open62541/client.h>
 
 enum KelvinToolState {
     KELVIN_UNKNOWN = 0,
@@ -31,6 +34,7 @@ private:
     UA_Client *client = nullptr;
 
     std::thread stepperThread;
+    std::thread setVoltageThread;
     bool running;
 
     bool isSimulation;

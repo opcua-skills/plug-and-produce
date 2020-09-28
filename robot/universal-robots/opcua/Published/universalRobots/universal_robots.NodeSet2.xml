@@ -1293,7 +1293,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=16129</Reference>
     </References>
   </UAObject>
-  <UAObject NodeId="ns=1;i=15024" BrowseName="1:JointLinearMoveSkill" ParentNodeId="ns=1;i=16212">
+  <UAObject NodeId="ns=1;i=15024" BrowseName="1:JointLinearMoveSkill" ParentNodeId="ns=1;i=16212" EventNotifier="1">
     <DisplayName>JointLinearMoveSkill</DisplayName>
     <References>
       <Reference ReferenceType="HasComponent">ns=1;i=15026</Reference>
@@ -1475,7 +1475,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15072</Reference>
     </References>
   </UAVariable>
-  <UAObject NodeId="ns=1;i=15078" BrowseName="1:JointPtpMoveSkill" ParentNodeId="ns=1;i=16212">
+  <UAObject NodeId="ns=1;i=15078" BrowseName="1:JointPtpMoveSkill" ParentNodeId="ns=1;i=16212" EventNotifier="1">
     <DisplayName>JointPtpMoveSkill</DisplayName>
     <References>
       <Reference ReferenceType="HasComponent">ns=1;i=15079</Reference>
@@ -1657,7 +1657,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">ns=1;i=15127</Reference>
     </References>
   </UAVariable>
-  <UAObject NodeId="ns=1;i=15133" BrowseName="1:CartesianLinearMoveSkill" ParentNodeId="ns=1;i=16212">
+  <UAObject NodeId="ns=1;i=15133" BrowseName="1:CartesianLinearMoveSkill" ParentNodeId="ns=1;i=16212" EventNotifier="1">
     <DisplayName>CartesianLinearMoveSkill</DisplayName>
     <References>
       <Reference ReferenceType="HasComponent">ns=1;i=15134</Reference>
@@ -1847,7 +1847,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=15170</Reference>
     </References>
   </UAVariable>
-  <UAObject NodeId="ns=1;i=15185" BrowseName="1:CartesianPtpMoveSkill" ParentNodeId="ns=1;i=16212">
+  <UAObject NodeId="ns=1;i=15185" BrowseName="1:CartesianPtpMoveSkill" ParentNodeId="ns=1;i=16212" EventNotifier="1">
     <DisplayName>CartesianPtpMoveSkill</DisplayName>
     <References>
       <Reference ReferenceType="HasComponent">ns=1;i=15186</Reference>

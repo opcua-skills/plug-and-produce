@@ -11,6 +11,20 @@ find_package(Boost COMPONENTS regex)
 # run from your own project's code.
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 
+# Debug
+string(TOLOWER "${CMAKE_BUILD_TYPE}" BUILD_TYPE_LOWER_CASE)
+if(BUILD_TYPE_LOWER_CASE STREQUAL "debug")
+    if("x${CMAKE_C_COMPILER_ID}" STREQUAL "xClang")
+        # Add default sanitizer settings when using clang and Debug build.
+        # This allows e.g. CLion to find memory locations for SegFaults
+        message(STATUS "Clang Sanitizer enabled")
+        set(SANITIZER_FLAGS "-g -fno-omit-frame-pointer -gline-tables-only -fsanitize=address -fsanitize-address-use-after-scope -fsanitize-coverage=trace-pc-guard,trace-cmp -fsanitize=leak -fsanitize=undefined")
+        #set(SANITIZER_FLAGS "-g -fno-omit-frame-pointer -gline-tables-only -fsanitize=thread -fsanitize=undefined")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SANITIZER_FLAGS}" PARENT_SCOPE)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SANITIZER_FLAGS}" PARENT_SCOPE)
+    endif()
+endif()
+
 add_subdirectory(deps/common)
 include_directories(include)
 include_directories(${COMMON_INCLUDE_DIRS}
@@ -90,6 +104,7 @@ generate_certificate(
 )
 
 add_executable(semantic-mes
+        $<TARGET_OBJECTS:${PROJECT_NAME}-common>
         $<TARGET_OBJECTS:${PROJECT_NAME}-common-client>
         $<TARGET_OBJECTS:${PROJECT_NAME}-common-nodeset>
         $<TARGET_OBJECTS:${PROJECT_NAME}-common-skill-detector>
@@ -117,3 +132,9 @@ add_dependencies(semantic-mes
                  ${PROJECT_NAME}-common-ns-semantic_mes
                  )
 target_link_libraries(semantic-mes open62541::open62541 config++ ${RL_LIBRARIES} ${Boost_LIBRARIES})
+
+install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/certs
+        DESTINATION semantic-mes
+        USE_SOURCE_PERMISSIONS
+        )
+install(TARGETS semantic-mes DESTINATION bin)

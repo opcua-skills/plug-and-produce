@@ -1,7 +1,10 @@
-//
-// Created by profanter on 17/12/2019.
-// Copyright (c) 2019 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #ifndef KELVIN_TOOLCHANGER_CHANGETOOLSKILL_HPP
 #define KELVIN_TOOLCHANGER_CHANGETOOLSKILL_HPP
@@ -80,14 +83,13 @@ namespace fortiss {
             public:
 
                 explicit ChangeToolSkill(
-                        UA_Server
-                        * server,
+                        const std::shared_ptr<fortiss::opcua::OpcUaServer>& server,
                         std::shared_ptr<spdlog::logger>& logger,
                         const UA_NodeId& skillNodeId,
                         const std::string& eventSourceName
                 ) :
                         SkillBase(server, logger, skillNodeId, eventSourceName),
-                        nsDiIdx(UA_Server_getNamespaceIdByName(server, NAMESPACE_URI_DI)),
+                        nsDiIdx(UA_Server_getNamespaceIdByName(server->getLocked().get(), NAMESPACE_URI_DI)),
                         nsKelvinToolchangerId(UA_Server_getNamespaceIdByName(server, NAMESPACE_URI_KELVIN_TOOLCHANGER)),
                         parameterSetNodeId(UA_Server_getObjectComponentId(server, skillNodeId,
                                                                           UA_QUALIFIEDNAME(static_cast<UA_UInt16>(nsDiIdx),
@@ -103,7 +105,8 @@ namespace fortiss {
                     // use dynamic cast to make sure polymorphic resolution is correct
                     auto selfProgram = dynamic_cast<Program*>(this);
 
-                    if (UA_Server_setNodeContext(server, skillNodeId, selfProgram) != UA_STATUSCODE_GOOD) {
+                    LockedServer ls = server->getLocked();
+                    if (UA_Server_setNodeContext(ls.get(), skillNodeId, selfProgram) != UA_STATUSCODE_GOOD) {
                         throw std::runtime_error("Adding method context failed");
                     }
                 }

@@ -1,38 +1,27 @@
 OPC UA Robot Driver for Universal Robots
 ========================================
 
-This readme is still needs some more input...
+Uses the Robotics Library to control Universal Robots. Tested with a UR5
 
+## How to build
 
-Required dependencies:
+Install all dependencies as given in the Docker Container file:
 
-## Install Robotics Library
+https://git.fortiss.org/robotics/component/common/-/blob/master/ci/Dockerfile
+
+Then build:
 
 ```bash
-git clone git@gitlab.com:roboticslibrary/rl.git
-cd rl
-mkdir RelWithDebInfo && cd RelWithDebInfo
-cmake -DBUILD_RL_PLAN=OFF -DBUILD_DEMOS=ON -DUSE_QT5=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX:PATH=$HOME/install/rl ..
-make -j3
-make install
+mkdir build
+cd build
+cmake ..
+make -j
 ```
 
+## How to run
 
-## Install open62541
+Make sure to change `/path/to/repo` in the following command to the full path of this repo.
 
-```bash
-git clone https://github.com/open62541/open62541.git
-cd open62541
-git checkout master
-
-mkdir build && cd build
-
-cmake -DUA_ENABLE_SUBSCRIPTIONS_EVENTS=ON -DUA_NAMESPACE_ZERO=FULL -DUA_ENABLE_DISCOVERY_MULTICAST=ON ..
-sudo make install
 ```
-
-## Other package dependencies:
-
-```bash
-sudo apt install libconfig++-dev
+./universal-robots --config=/path/to/repo/component.cfg --certs-client=/path/to/repo/certs/client/$(hostname) --certs-server=/path/to/repo/certs/server/$(hostname)
 ```

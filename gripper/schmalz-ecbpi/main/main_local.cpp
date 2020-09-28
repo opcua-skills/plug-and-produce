@@ -1,7 +1,10 @@
-//
-// Created by profanter on 01/21/20.
-// Copyright (c) 2020 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #include <memory>
 #include <chrono>
@@ -19,15 +22,16 @@
 bool running = true;
 
 static void stopHandler(int) {
-    running = false;
     logger->warn("Received Ctrl-C. Shutting down...");
+    logger->flush();
+    running = false;
 }
 
 
-
-int main(int argc, char *argv[]) {
-
-
+int main(
+        int argc,
+        char* argv[]
+) {
     // ------------- General initialization -------------------
 
     signal(SIGINT, stopHandler);
@@ -45,14 +49,14 @@ int main(int argc, char *argv[]) {
     try {
         cfg.readFile(configFile.c_str());
     }
-    catch (const libconfig::FileIOException &fioex) {
+    catch (const libconfig::FileIOException& fioex) {
         std::cerr << "I/O error while reading configuration file." << fioex.what() << std::endl;
         #ifdef USE_RASPI
         ledDaemonClient.setStatus(LedColor::RED, LedStatus::BLINK);
         #endif
         return (EXIT_FAILURE);
     }
-    catch (const libconfig::ParseException &pex) {
+    catch (const libconfig::ParseException& pex) {
         std::cerr << "Configuration file parse error at " << pex.getFile() << ":" << pex.getLine()
                   << " - " << pex.getError() << std::endl;
         #ifdef USE_RASPI
@@ -60,43 +64,25 @@ int main(int argc, char *argv[]) {
         #endif
         return (EXIT_FAILURE);
     }
-    const libconfig::Setting &settings = cfg.getRoot();
+    const libconfig::Setting& settings = cfg.getRoot();
 
-
-    logger = fortiss::log::get("gripper/schmalz-ecpbi");
-
+    logger = fortiss::log::LoggerFactory::createLogger("robot/schmalz-ecpbi",
+                                                       settings["logging"]["level"]["app"],
+                                                       settings["logging"].exists("path") ? settings["logging"]["path"] : "");
+    std::shared_ptr<spdlog::logger> loggerServer = logger->clone(logger->name() + "-ua-server");
+    fortiss::log::LoggerFactory::setLoggerLevel(loggerServer, settings["logging"]["level"]["opcua"]);
+    std::shared_ptr<spdlog::logger> loggerClient = logger->clone(logger->name() + "-ua-reg");
+    fortiss::log::LoggerFactory::setLoggerLevel(loggerClient, settings["logging"]["level"]["opcua"]);
 
     try {
-        std::string logLevel = settings["log"];
-        if (logLevel == "trace")
-            logger->set_level(spdlog::level::level_enum::trace);
-        else if (logLevel == "debug")
-            logger->set_level(spdlog::level::level_enum::debug);
-        else if (logLevel == "info")
-            logger->set_level(spdlog::level::level_enum::info);
-        else if (logLevel == "warn")
-            logger->set_level(spdlog::level::level_enum::warn);
-        else if (logLevel == "err")
-            logger->set_level(spdlog::level::level_enum::err);
-        else if (logLevel == "critical")
-            logger->set_level(spdlog::level::level_enum::critical);
-        else if (logLevel == "off")
-            logger->set_level(spdlog::level::level_enum::off);
-        else {
-            std::cerr
-                    << "Invalid 'log' setting in configuration file. Must be one of [trace, debug, info, warn, err, critical, off]"
-                    << std::endl;
-            return (EXIT_FAILURE);
-        }
-
         logger->info("Starting Gripper Schmalz ECBPi ...");
-        if (!run_opcua((UA_UInt16) ((int) settings["opcua"]["port"]), &running, true)) {
+        if (!run_opcua((UA_UInt16) ((int) settings["opcua"]["port"]), &running, true, logger, loggerServer, loggerClient)) {
             logger->error("Could not start schmalz-ecbpi opcua");
             return EXIT_FAILURE;
         }
     }
-    catch (const libconfig::SettingNotFoundException &nfex) {
-        logger->error("Setting missing in configuration file {}. {} in {}",nfex.getPath(), nfex.what());
+    catch (const libconfig::SettingNotFoundException& nfex) {
+        logger->error("Setting missing in configuration file {}. {} in {}", nfex.getPath(), nfex.what());
         logger->flush();
         return (EXIT_FAILURE);
     }

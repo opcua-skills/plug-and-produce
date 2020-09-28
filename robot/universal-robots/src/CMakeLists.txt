@@ -58,12 +58,14 @@ generate_certificate(
 add_executable(universal-robots main.cpp
         ${UA_NODESET_ROB_UR_SOURCES}
         ${UA_TYPES_ROB_UR_SOURCES}
+        $<TARGET_OBJECTS:${PROJECT_NAME}-common>
         $<TARGET_OBJECTS:${PROJECT_NAME}-common-nodeset>
         UniversalRobotControl.cpp UniversalRobotControl.h)
 
 add_dependencies(${TARGET_NAME}
                  ${TARGET_NAME}-certs-client
                  ${TARGET_NAME}-certs-server
+                 ${PROJECT_NAME}-common
                  ${PROJECT_NAME}-common-nodeset
                  ${PROJECT_NAME}-common-ns-rob_ur)
 

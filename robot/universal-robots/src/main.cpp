@@ -1,7 +1,10 @@
-//
-// Created by profanter on 11/29/18.
-// Copyright (c) 2018 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #include <common/component.h>
 #include <common/logging_opcua.h>
@@ -32,24 +35,27 @@ static void stopHandler(int) {
 }
 
 static bool
-createNodesFromNodeset(UA_Server* uaServer) {
-    if (namespace_di_generated(uaServer) != UA_STATUSCODE_GOOD) {
+createNodesFromNodeset(
+        const std::shared_ptr<fortiss::opcua::OpcUaServer>& uaServer
+) {
+    LockedServer ls = uaServer->getLocked();
+    if (namespace_di_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the DI namespace failed. Please check previous error output.");
         return false;
     }
-    if (namespace_rob_generated(uaServer) != UA_STATUSCODE_GOOD) {
+    if (namespace_rob_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the Robotics namespace failed. Please check previous error output.");
         return false;
     }
-    if (namespace_fortiss_device_generated(uaServer) != UA_STATUSCODE_GOOD) {
+    if (namespace_fortiss_device_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the fortiss device namespace failed. Please check previous error output.");
         return false;
     }
-    if (namespace_for_rob_generated(uaServer) != UA_STATUSCODE_GOOD) {
+    if (namespace_for_rob_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the fortiss Robotics namespace failed. Please check previous error output.");
         return false;
     }
-    if (namespace_rob_ur_generated(uaServer) != UA_STATUSCODE_GOOD) {
+    if (namespace_rob_ur_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the Universal Robot namespace failed. Please check previous error output.");
         return false;
     }
@@ -60,6 +66,8 @@ int main(
         int argc,
         char* argv[]
 ) {
+
+
     // ------------- General initialization -------------------
 
     signal(SIGINT, stopHandler);
@@ -78,8 +86,8 @@ int main(
     CLI::App app{"Universal Robot OPC UA Control"};
 
     std::string configFile = "universal-robots.cfg";
-    std::string certFiles = "";
-    std::string clientCertFiles = "";
+    std::string certFiles;
+    std::string clientCertFiles;
     app.add_option("--config", configFile, "Configuration file path", true);
     app.add_option("--certs-server", certFiles, "The server certificate files without extension", true);
     app.add_option("--certs-client", clientCertFiles, "The client certificate files without extension", false);
@@ -102,43 +110,15 @@ int main(
     }
     const libconfig::Setting& settings = cfg.getRoot();
 
-    logger = fortiss::log::get("robot/ur");
+    logger = fortiss::log::LoggerFactory::createLogger("robot/ur",
+                                                       settings["logging"]["level"]["app"],
+                                                       settings["logging"].exists("path") ? settings["logging"]["path"] : "");
 
-    UA_ServerConfig uaServerConfig;
-    UA_Server* uaServer = nullptr;
-    UA_Client* clientRegister = nullptr;
+    std::shared_ptr<fortiss::opcua::OpcUaServer> uaServer;
+
     int exitCode = EXIT_SUCCESS;
 
-    std::shared_ptr<spdlog::logger> loggerClient = logger->clone(logger->name() + "-reg");
-    if (loggerClient->level() < spdlog::level::err)
-        loggerClient->set_level(spdlog::level::err);
-    std::shared_ptr<spdlog::logger> loggerServer = logger->clone(logger->name());
-    if (loggerServer->level() < spdlog::level::err)
-        loggerServer->set_level(spdlog::level::err);
-
     try {
-        std::string logLevel = settings["log"];
-        if (logLevel == "trace")
-            logger->set_level(spdlog::level::level_enum::trace);
-        else if (logLevel == "debug")
-            logger->set_level(spdlog::level::level_enum::debug);
-        else if (logLevel == "info")
-            logger->set_level(spdlog::level::level_enum::info);
-        else if (logLevel == "warn")
-            logger->set_level(spdlog::level::level_enum::warn);
-        else if (logLevel == "err")
-            logger->set_level(spdlog::level::level_enum::err);
-        else if (logLevel == "critical")
-            logger->set_level(spdlog::level::level_enum::critical);
-        else if (logLevel == "off")
-            logger->set_level(spdlog::level::level_enum::off);
-        else {
-            std::cerr
-                    << "Invalid 'log' setting in configuration file. Must be one of [trace, debug, info, warn, err, critical, off]"
-                    << std::endl;
-            return (EXIT_FAILURE);
-        }
-
         if (clientCertFiles.empty()) {
             logger->error("Client certificates are required. Use --certs-client command line option.");
             return (EXIT_FAILURE);
@@ -149,80 +129,40 @@ int main(
             return (EXIT_FAILURE);
         }
 
-        // ------------- OPC UA initialization -------------------
-        if (fortiss::opcua::initServerConfig(
-                loggerServer,
-                &uaServerConfig,
+        logger->info("Starting Universal Robot Control - {} ...", settings["opcua"]["appName"].c_str());
+
+        uaServer = std::make_shared<fortiss::opcua::OpcUaServer>(
+                settings,
+                logger,
                 "fortiss.component.robot.universal-robot-ur5",
                 settings["opcua"]["appName"],
-                (UA_UInt16) ((int) settings["opcua"]["port"]),
-                settings["opcua"]["encryption"],
-                settings["opcua"]["anonymous"],
-                certFiles) != UA_STATUSCODE_GOOD) {
-            return EXIT_FAILURE;
-        }
+                certFiles,
+                "fortiss.component.robot.universal-robot-ur5.client",
+                "fortiss - Robot - UR5 - Client",
+                clientCertFiles);
 
         // Default is 100ms. We support 8ms here as fastest publishing interval
-        uaServerConfig.publishingIntervalLimits.min = 8;
+        uaServer->getServerConfig()->publishingIntervalLimits.min = 8;
 
-        uaServer = UA_Server_newWithConfig(&uaServerConfig);
-        if (!uaServer) {
-            logger->error("Can not create server instance");
-            return EXIT_FAILURE;
-        }
+
         if (!createNodesFromNodeset(uaServer)) {
             throw std::runtime_error("Creating nodes from nodeset failed");
         }
 
-        // ------------- OPC UA Model initialization -------------------
-        logger->info("Starting Universal Robot Control ...");
         fortiss::robot::UniversalRobotControl control(settings["robot"], uaServer);
 
         if (!control.connect()) {
             throw std::runtime_error("Controller connect failed");
         }
 
-        UA_StatusCode retval = UA_Server_run_startup(uaServer);
-        if (retval != UA_STATUSCODE_GOOD) {
+        if (const UA_StatusCode retval = uaServer->init(true) != UA_STATUSCODE_GOOD) {
             throw std::runtime_error("Starting up the server failed with " + std::string(UA_StatusCode_name(retval)));
         }
 
         // TODO set tool
 
-        UA_UInt64 periodicCallbackId = 0;
-        const fortiss::opcua::serverOnNetworkCallbackData onLdsData = {
-                .filterServerName = std::string(settings["lds-uri"].c_str()),
-                .callbackOnAnnounceOnly = true,
-                .onServerAnnounce = [uaServer, &periodicCallbackId, &clientRegister, &clientCertFiles, &loggerClient]
-                        (
-                                const UA_ServerOnNetwork* serverOnNetwork,
-                                UA_Boolean isServerAnnounce
-                        ) {
-                    if (clientRegister)
-                        return;
-                    logger->info("Found LDS Server on {}", std::string((char*) serverOnNetwork->discoveryUrl.data, serverOnNetwork->discoveryUrl.length));
-                    if (periodicCallbackId != 0)
-                        UA_Server_removeCallback(uaServer, periodicCallbackId);
-
-                    std::string clientCert = clientCertFiles + "_cert.der";
-                    std::string clientKey = clientCertFiles + "_key.der";
-
-                    fortiss::opcua::UA_Server_setPeriodicRegister(
-                            uaServer,
-                            loggerClient,
-                            clientCert,
-                            clientKey,
-                            "fortiss.component.robot.universal-robot-ur5.client",
-                            "fortiss - Robot - UR5 - Client",
-                            serverOnNetwork,
-                            &periodicCallbackId,
-                            &clientRegister);
-                }
-        };
-        fortiss::opcua::UA_Server_onServerAnnounce(uaServer, onLdsData);
-
         while (running) {
-            UA_Server_run_iterate(uaServer, false);
+            uaServer->iterate();
             if (!control.step()) {
                 break;
             }
@@ -234,7 +174,7 @@ int main(
     catch (const libconfig::SettingNotFoundException& nfex) {
         logger->error("Setting missing in configuration file. {} -> {}", nfex.what(), nfex.getPath());
         logger->flush();
-        return (EXIT_FAILURE);
+        exitCode = EXIT_FAILURE;
     }
     catch (const std::runtime_error& rex) {
         logger->critical("Could not initialize robot control. {} ", rex.what());
@@ -242,20 +182,8 @@ int main(
 
         exitCode = EXIT_FAILURE;
     }
+    uaServer.reset();
 
-    // cppcheck-suppress knownConditionTrueFalse
-    if (clientRegister != nullptr) {
-        UA_StatusCode retval = UA_Server_unregister_discovery(uaServer, clientRegister);
-        if (retval != UA_STATUSCODE_GOOD) {
-            logger->error("Can not unregister from discovery server: {}", UA_StatusCode_name(retval));
-        }
-        UA_Client_disconnect(clientRegister);
-        UA_Client_delete(clientRegister);
-    }
-
-    UA_Server_run_shutdown(uaServer);
-    UA_Server_delete(uaServer);
-
-    logger->flush();
+    spdlog::shutdown();
     return exitCode;
 }

@@ -40,7 +40,7 @@
           <Variable SymbolicName="SEMANTIC_MES:AbstractProcessIri" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:String" ModellingRule="Mandatory" ValueRank="Scalar" AccessLevel="ReadWrite">
             <Description>The IRI of the process to be executed</Description>
             <DefaultValue>
-              <uax:String>http://www.fortiss.org/ont/databackbone/process-1#Process-1</uax:String>
+              <uax:String>http://www.fortiss.org/ont/acra4dt/process-toolchange#Process-ToolChange</uax:String>
             </DefaultValue>
           </Variable>
           <Variable SymbolicName="SEMANTIC_MES:ExecutionMode" TypeDefinition="OpcUa:BaseDataVariableType" DataType="OpcUa:String" ModellingRule="Mandatory" ValueRank="Scalar" AccessLevel="ReadWrite">

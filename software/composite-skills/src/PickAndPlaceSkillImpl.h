@@ -1,7 +1,10 @@
-//
-// Created by profanter on 17/12/2019.
-// Copyright (c) 2019 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #ifndef COMPOSITE_SKILLS_PICKANDPLACESKILLIMPL_H
 #define COMPOSITE_SKILLS_PICKANDPLACESKILLIMPL_H
@@ -21,13 +24,15 @@ namespace fortiss {
         private:
 
             std::shared_ptr<spdlog::logger> logger;
+            std::shared_ptr<spdlog::logger> loggerOpcua;
             std::chrono::steady_clock::time_point skillStartTime;
 
             CompositeSkills* compositeSkills;
 
         public:
             explicit PickAndPlaceSkillImpl(
-                    std::shared_ptr<spdlog::logger> logger,
+                    std::shared_ptr<spdlog::logger> _logger,
+                    std::shared_ptr<spdlog::logger> _loggerOpcua,
                     CompositeSkills* compositeSkills
             );
 

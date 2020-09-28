@@ -1,7 +1,10 @@
-//
-// Created by profanter on 17/12/2019.
-// Copyright (c) 2019 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #include <namespace_di_generated.h>
 #include <namespace_fortiss_device_generated.h>
@@ -18,10 +21,12 @@
 #include <open62541/client_highlevel.h>
 #include <for_rob_nodeids.h>
 
+#define SPEED_FACTOR 20
 
 KelvinToolchanger::KelvinToolchanger(
         std::shared_ptr<spdlog::logger> _logger,
-        UA_Server* server,
+        std::shared_ptr<spdlog::logger> _loggerOpcua,
+        std::shared_ptr<fortiss::opcua::OpcUaServer> _server,
         const libconfig::Setting& toolchangerSettings,
         const std::string& clientCertPath,
         const std::string& clientKeyPath,
@@ -29,7 +34,8 @@ KelvinToolchanger::KelvinToolchanger(
         const std::string& clientName
 ) :
         logger(std::move(_logger)),
-        server(server),
+        loggerOpcua(std::move(_loggerOpcua)),
+        server(std::move(_server)),
         toolchangerSettings(toolchangerSettings),
         isSimulation(toolchangerSettings["simulation"]),
         adcAdapter(new AdcAdapter(logger, toolchangerSettings["simulation"])),
@@ -37,7 +43,7 @@ KelvinToolchanger::KelvinToolchanger(
         clientKeyPath(clientKeyPath),
         clientAppUri(clientAppUri),
         clientName(clientName),
-        skillDetector(new SkillDetector(logger, clientCertPath, clientKeyPath, clientAppUri, clientName)) {
+        skillDetector(new SkillDetector(logger, loggerOpcua, clientCertPath, clientKeyPath, clientAppUri, clientName)) {
 
     if (isSimulation) {
         coachWrapper = new rlCoachWrapper();
@@ -50,15 +56,18 @@ KelvinToolchanger::KelvinToolchanger(
         throw std::runtime_error("Can not initialize Kelvin Toolchanger nodeset");
     }
 
-    currentToolReadyNode = UA_NODEID_NUMERIC(
-            fortiss::opcua::UA_Server_getNamespaceIdByName(server, NAMESPACE_URI_KELVIN_TOOLCHANGER),
-            UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_CURRENTTOOL_READY);
-    currentToolDescriptionNode = UA_NODEID_NUMERIC(
-            fortiss::opcua::UA_Server_getNamespaceIdByName(server, NAMESPACE_URI_KELVIN_TOOLCHANGER),
-            UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_CURRENTTOOL_DESCRIPTION);
-    currentToolIdNode = UA_NODEID_NUMERIC(
-            fortiss::opcua::UA_Server_getNamespaceIdByName(server, NAMESPACE_URI_KELVIN_TOOLCHANGER),
-            UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_CURRENTTOOL_ID);
+    {
+        LockedServer ls = server->getLocked();
+        currentToolReadyNode = UA_NODEID_NUMERIC(
+                fortiss::opcua::UA_Server_getNamespaceIdByName(ls.get(), NAMESPACE_URI_KELVIN_TOOLCHANGER),
+                UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_CURRENTTOOL_READY);
+        currentToolDescriptionNode = UA_NODEID_NUMERIC(
+                fortiss::opcua::UA_Server_getNamespaceIdByName(ls.get(), NAMESPACE_URI_KELVIN_TOOLCHANGER),
+                UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_CURRENTTOOL_DESCRIPTION);
+        currentToolIdNode = UA_NODEID_NUMERIC(
+                fortiss::opcua::UA_Server_getNamespaceIdByName(ls.get(), NAMESPACE_URI_KELVIN_TOOLCHANGER),
+                UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_CURRENTTOOL_ID);
+    }
 
     UA_StatusCode retval = initSkills();
     if (retval != UA_STATUSCODE_GOOD)
@@ -100,15 +109,17 @@ KelvinToolchanger::~KelvinToolchanger() {
 }
 
 bool KelvinToolchanger::createNodesFromNodeset() {
-    if (namespace_di_generated(server) != UA_STATUSCODE_GOOD) {
+    LockedServer ls = server->getLocked();
+
+    if (namespace_di_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the DI namespace failed. Please check previous error output.");
         return false;
     }
-    if (namespace_fortiss_device_generated(server) != UA_STATUSCODE_GOOD) {
+    if (namespace_fortiss_device_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the fortiss device namespace failed. Please check previous error output.");
         return false;
     }
-    if (namespace_kelvin_toolchanger_generated(server) != UA_STATUSCODE_GOOD) {
+    if (namespace_kelvin_toolchanger_generated(ls.get()) != UA_STATUSCODE_GOOD) {
         logger->error("Adding the Kelvin Toolchanger namespace failed. Please check previous error output.");
         return false;
     }
@@ -117,32 +128,37 @@ bool KelvinToolchanger::createNodesFromNodeset() {
 
 UA_StatusCode KelvinToolchanger::initSkills() {
 
-    hasToolNode = UA_NODEID_NUMERIC(
-            fortiss::opcua::UA_Server_getNamespaceIdByName(
-                    server, NAMESPACE_URI_KELVIN_TOOLCHANGER),
-            UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_HASTOOL
-    );
-    currentToolReadyNode = UA_NODEID_NUMERIC(
-            fortiss::opcua::UA_Server_getNamespaceIdByName(
-                    server, NAMESPACE_URI_KELVIN_TOOLCHANGER),
-            UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_CURRENTTOOL_READY
-    );
-    currentToolDescriptionNode = UA_NODEID_NUMERIC(
-            fortiss::opcua::UA_Server_getNamespaceIdByName(
-                    server, NAMESPACE_URI_KELVIN_TOOLCHANGER),
-            UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_CURRENTTOOL_DESCRIPTION
-    );
-    currentToolIdNode = UA_NODEID_NUMERIC(
-            fortiss::opcua::UA_Server_getNamespaceIdByName(
-                    server, NAMESPACE_URI_KELVIN_TOOLCHANGER),
-            UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_CURRENTTOOL_ID
-    );
+    UA_NodeId changeToolSkillId;
+    {
+        LockedServer ls = server->getLocked();
 
-    UA_NodeId changeToolSkillId = UA_NODEID_NUMERIC(
-            fortiss::opcua::UA_Server_getNamespaceIdByName(
-                    server, NAMESPACE_URI_KELVIN_TOOLCHANGER),
-            UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_SKILLS_CHANGETOOLSKILL
-    );
+        hasToolNode = UA_NODEID_NUMERIC(
+                fortiss::opcua::UA_Server_getNamespaceIdByName(
+                        ls.get(), NAMESPACE_URI_KELVIN_TOOLCHANGER),
+                UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_HASTOOL
+        );
+        currentToolReadyNode = UA_NODEID_NUMERIC(
+                fortiss::opcua::UA_Server_getNamespaceIdByName(
+                        ls.get(), NAMESPACE_URI_KELVIN_TOOLCHANGER),
+                UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_CURRENTTOOL_READY
+        );
+        currentToolDescriptionNode = UA_NODEID_NUMERIC(
+                fortiss::opcua::UA_Server_getNamespaceIdByName(
+                        ls.get(), NAMESPACE_URI_KELVIN_TOOLCHANGER),
+                UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_CURRENTTOOL_DESCRIPTION
+        );
+        currentToolIdNode = UA_NODEID_NUMERIC(
+                fortiss::opcua::UA_Server_getNamespaceIdByName(
+                        ls.get(), NAMESPACE_URI_KELVIN_TOOLCHANGER),
+                UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_CURRENTTOOL_ID
+        );
+        changeToolSkillId = UA_NODEID_NUMERIC(
+                fortiss::opcua::UA_Server_getNamespaceIdByName(
+                        ls.get(), NAMESPACE_URI_KELVIN_TOOLCHANGER),
+                UA_KELVIN_TOOLCHANGERID_KELVINTOOLCHANGER_SKILLS_CHANGETOOLSKILL
+        );
+    }
+
 
     changeToolSkillImpl = new fortiss::kelvin_toolchanger::ChangeToolSkillImpl(logger,
                                                                                this);
@@ -180,62 +196,7 @@ void KelvinToolchanger::onServerAnnounce(
         const UA_ServerOnNetwork* serverOnNetwork,
         UA_Boolean isServerAnnounce
 ) {
-
-    std::string serverName = std::string((char*) serverOnNetwork->serverName.data, serverOnNetwork->serverName.length);
-
-    // create a copy of registered server struct since it may be deleted while the thread is still running.
-    UA_ServerOnNetwork* serverOnNetworkTemp = UA_ServerOnNetwork_new();
-    UA_ServerOnNetwork_copy(serverOnNetwork, serverOnNetworkTemp);
-    std::shared_ptr<UA_ServerOnNetwork> serverOnNetworkSafe = std::shared_ptr<UA_ServerOnNetwork>(serverOnNetworkTemp, [=](UA_ServerOnNetwork* ptr) {
-        UA_ServerOnNetwork_delete(ptr);
-    });
-
-    if (isServerAnnounce) {
-
-        std::vector<std::string> discoveryUrls;
-
-        std::string discoveryUrl = std::string((char*) serverOnNetwork->discoveryUrl.data, serverOnNetwork->discoveryUrl.length);
-
-        if (serverKnown.count(discoveryUrl) > 0)
-            return;
-
-        logger->info("Got register from component: {}", serverName);
-
-        discoveryUrls.emplace_back(discoveryUrl);
-        serverKnown.emplace(discoveryUrl, true);
-
-        std::thread([this, serverOnNetworkSafe, discoveryUrls]() {
-
-            std::shared_ptr<spdlog::logger> loggerClient = logger->clone(logger->name() + "-client");
-            if (loggerClient->level() < spdlog::level::err)
-                loggerClient->set_level(spdlog::level::err);
-
-            std::promise<std::shared_ptr<UA_EndpointDescription>> promiseEndpoint;
-            fortiss::opcua::getBestEndpointFromServer(discoveryUrls, promiseEndpoint, loggerClient);
-            std::future<std::shared_ptr<UA_EndpointDescription>> endpointFuture = promiseEndpoint.get_future();
-
-            std::future_status status = endpointFuture.wait_for(std::chrono::seconds(5));
-
-            if (status == std::future_status::ready) {
-                std::shared_ptr<UA_EndpointDescription> endpoint = endpointFuture.get();
-                skillDetector->componentConnected(serverOnNetworkSafe, endpoint);
-            }
-
-        }).detach();
-
-    } else {
-
-
-        std::string discoveryUrl = std::string((char*) serverOnNetwork->discoveryUrl.data, serverOnNetwork->discoveryUrl.length);
-        if (serverKnown.count(discoveryUrl) == 0)
-            return;
-
-        logger->info("Got unregister from component: {}", serverName);
-        serverKnown.erase(discoveryUrl);
-        skillDetector->componentDisconnected(serverOnNetworkSafe);
-    }
-
-
+    skillDetector->onServerAnnounce(serverOnNetwork, isServerAnnounce);
 }
 
 void KelvinToolchanger::onToolUpdate(
@@ -265,7 +226,11 @@ void KelvinToolchanger::onToolUpdate(
     UA_Variant hasToolVar;
     UA_Boolean hasTool = toolState == KELVIN_TOOL_CONNECTED;
     UA_Variant_setScalar(&hasToolVar, &hasTool, &UA_TYPES[UA_TYPES_BOOLEAN]);
-    UA_StatusCode retval = UA_Server_writeValue(server, hasToolNode, hasToolVar);
+    UA_StatusCode retval;
+    {
+        LockedServer ls = server->getLocked();
+        retval = UA_Server_writeValue(ls.get(), hasToolNode, hasToolVar);
+    }
     if (retval != UA_STATUSCODE_GOOD) {
         logger->error("Could not set hasTool variable: {}", UA_StatusCode_name(retval));
     }
@@ -279,10 +244,11 @@ UA_StatusCode KelvinToolchanger::takeToolAtPosition(
 ) {
 
 
-    this->logger->info("Changing Tool\n\tPosition: {}, {}, {}, {}, {}, {}\n\tCurrent: {}",
+    this->logger->info("Changing Tool\n\tPosition: {}, {}, {}, {}, {}, {}\n\tExpected App URI: {}\n\tCurrent: {}",
                        toolPosition->cartesianCoordinates.x, toolPosition->cartesianCoordinates.y,
                        toolPosition->cartesianCoordinates.z, toolPosition->orientation.a * RAD_TO_DEG,
-                       toolPosition->orientation.b * RAD_TO_DEG, toolPosition->orientation.c * RAD_TO_DEG, adcAdapter->getToolId());
+                       toolPosition->orientation.b * RAD_TO_DEG, toolPosition->orientation.c * RAD_TO_DEG,
+                       expectedAppUri, adcAdapter->getToolId());
 
     if (this->getToolState() == KELVIN_INTERMEDIATE) {
         this->logger->error("Can not take tool while changer is in intermediate state. Manually move the locking mechanism.");
@@ -333,8 +299,8 @@ UA_StatusCode KelvinToolchanger::takeToolAtPosition(
     const static double defaultRotate = -130.0 * DEG_TO_RAD;
     const static double lockedRotate = 63.0 * DEG_TO_RAD;
 
-    double fastCartSpeed[6] = {0.2, 0.2, 0.2, 20 * DEG_TO_RAD, 20 * DEG_TO_RAD, 20 * DEG_TO_RAD};
-    double slowCartSpeed[6] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
+    double fastCartSpeed[6] = {0.2 * SPEED_FACTOR, 0.2 * SPEED_FACTOR, 0.2 * SPEED_FACTOR, 20 * DEG_TO_RAD * SPEED_FACTOR, 20 * DEG_TO_RAD * SPEED_FACTOR, 20 * DEG_TO_RAD * SPEED_FACTOR};
+    double slowCartSpeed[6] = {0.1 * SPEED_FACTOR, 0.1 * SPEED_FACTOR, 0.1 * SPEED_FACTOR, 10 * DEG_TO_RAD * SPEED_FACTOR, 10 * DEG_TO_RAD * SPEED_FACTOR, 10 * DEG_TO_RAD * SPEED_FACTOR};
     if (isSimulation) {
         // full speed in simulation
         memset(&fastCartSpeed, 0, sizeof(fastCartSpeed));
@@ -370,6 +336,7 @@ UA_StatusCode KelvinToolchanger::takeToolAtPosition(
     UA_StatusCode retval = fortiss::skill::moveRobotToCartesian(
             robotCartesianPtpMoveSkill,
             logger,
+            loggerOpcua,
             robotToTool * moveTransform,
             "",
             fastCartSpeed);
@@ -384,6 +351,7 @@ UA_StatusCode KelvinToolchanger::takeToolAtPosition(
     retval = fortiss::skill::moveRobotToCartesian(
             robotCartesianLinearMoveSkill,
             logger,
+            loggerOpcua,
             robotToTool * moveTransform,
             "",
             slowCartSpeed);
@@ -430,9 +398,9 @@ UA_StatusCode KelvinToolchanger::takeToolAtPosition(
 
 
     // Move to "Locking" Position
-    // Locking the toolchanger requires a rotation by 68 degree (default 63 degree + 3 degree overshoot)
+    // Locking the toolchanger requires a rotation by 65 degree (default 63 degree + 2 degree overshoot)
     moveTransform = ::rl::math::AngleAxis(
-            -defaultRotate - lockedRotate - 3 * DEG_TO_RAD,
+            -defaultRotate - lockedRotate - 2 * DEG_TO_RAD,
             ::rl::math::Vector3::UnitZ()
     ) * ::rl::math::AngleAxis(
             0.0,
@@ -447,6 +415,7 @@ UA_StatusCode KelvinToolchanger::takeToolAtPosition(
     retval = fortiss::skill::moveRobotToCartesian(
             robotCartesianLinearMoveSkill,
             logger,
+            loggerOpcua,
             robotToTool * moveTransform,
             "",
             slowCartSpeed);
@@ -476,6 +445,7 @@ UA_StatusCode KelvinToolchanger::takeToolAtPosition(
     retval = fortiss::skill::moveRobotToCartesian(
             robotCartesianLinearMoveSkill,
             logger,
+            loggerOpcua,
             robotToTool * moveTransform,
             "",
             slowCartSpeed);
@@ -490,6 +460,7 @@ UA_StatusCode KelvinToolchanger::takeToolAtPosition(
     retval = fortiss::skill::moveRobotToCartesian(
             robotCartesianLinearMoveSkill,
             logger,
+            loggerOpcua,
             robotToTool * moveTransform,
             "",
             slowCartSpeed);
@@ -523,6 +494,7 @@ UA_StatusCode KelvinToolchanger::takeToolAtPosition(
     retval = fortiss::skill::moveRobotToCartesian(
             robotCartesianPtpMoveSkill,
             logger,
+            loggerOpcua,
             robotToTool * moveTransform,
             "",
             fastCartSpeed);
@@ -538,6 +510,7 @@ UA_StatusCode KelvinToolchanger::takeToolAtPosition(
     retval = fortiss::skill::moveRobotToCartesian(
             robotCartesianPtpMoveSkill,
             logger,
+            loggerOpcua,
             robotToTool * moveTransform,
             "",
             fastCartSpeed);
@@ -588,8 +561,8 @@ UA_StatusCode KelvinToolchanger::dropCurrentTool() {
      * The following steps are also explained in the Kelvin User Manual
      */
 
-    double fastCartSpeed[6] = {0.2, 0.2, 0.2, 20 * DEG_TO_RAD, 20 * DEG_TO_RAD, 20 * DEG_TO_RAD};
-    double slowCartSpeed[6] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
+    double fastCartSpeed[6] = {0.2 * SPEED_FACTOR, 0.2 * SPEED_FACTOR, 0.2 * SPEED_FACTOR, 20 * DEG_TO_RAD * SPEED_FACTOR, 20 * DEG_TO_RAD * SPEED_FACTOR, 20 * DEG_TO_RAD * SPEED_FACTOR};
+    double slowCartSpeed[6] = {0.1 * SPEED_FACTOR, 0.1 * SPEED_FACTOR, 0.1 * SPEED_FACTOR, 10 * DEG_TO_RAD * SPEED_FACTOR, 10 * DEG_TO_RAD * SPEED_FACTOR, 10 * DEG_TO_RAD * SPEED_FACTOR};
     if (isSimulation) {
         // full speed in simulation
         memset(&fastCartSpeed, 0, sizeof(fastCartSpeed));
@@ -616,6 +589,7 @@ UA_StatusCode KelvinToolchanger::dropCurrentTool() {
     retval = fortiss::skill::moveRobotToCartesian(
             robotCartesianPtpMoveSkill,
             logger,
+            loggerOpcua,
             robotToTool * moveTransform,
             "",
             fastCartSpeed);
@@ -632,6 +606,7 @@ UA_StatusCode KelvinToolchanger::dropCurrentTool() {
     retval = fortiss::skill::moveRobotToCartesian(
             robotCartesianLinearMoveSkill,
             logger,
+            loggerOpcua,
             robotToTool * moveTransform,
             "",
             fastCartSpeed);
@@ -658,6 +633,7 @@ UA_StatusCode KelvinToolchanger::dropCurrentTool() {
     retval = fortiss::skill::moveRobotToCartesian(
             robotCartesianPtpMoveSkill,
             logger,
+            loggerOpcua,
             robotToTool * moveTransform,
             "",
             fastCartSpeed);
@@ -685,6 +661,7 @@ UA_StatusCode KelvinToolchanger::dropCurrentTool() {
     retval = fortiss::skill::moveRobotToCartesian(
             robotCartesianLinearMoveSkill,
             logger,
+            loggerOpcua,
             robotToTool * moveTransform,
             "",
             slowCartSpeed);
@@ -716,6 +693,7 @@ UA_StatusCode KelvinToolchanger::dropCurrentTool() {
     retval = fortiss::skill::moveRobotToCartesian(
             robotCartesianLinearMoveSkill,
             logger,
+            loggerOpcua,
             robotToTool * moveTransform,
             "",
             slowCartSpeed);
@@ -746,6 +724,7 @@ UA_StatusCode KelvinToolchanger::dropCurrentTool() {
     retval = fortiss::skill::moveRobotToCartesian(
             robotCartesianLinearMoveSkill,
             logger,
+            loggerOpcua,
             robotToTool * moveTransform,
             "",
             slowCartSpeed);
@@ -778,6 +757,7 @@ UA_StatusCode KelvinToolchanger::dropCurrentTool() {
     retval = fortiss::skill::moveRobotToCartesian(
             robotCartesianLinearMoveSkill,
             logger,
+            loggerOpcua,
             robotToTool * moveTransform,
             "",
             slowCartSpeed);
@@ -830,6 +810,7 @@ UA_StatusCode KelvinToolchanger::powerOffTool() {
 
     std::string discoveryUrl;
 
+
     if (currentToolDescription.discoveryUrlsSize > 0)
         discoveryUrl = std::string((char*) currentToolDescription.discoveryUrls[0].data, currentToolDescription.discoveryUrls[0].length);
 
@@ -837,6 +818,8 @@ UA_StatusCode KelvinToolchanger::powerOffTool() {
     UA_ApplicationDescription_init(&currentToolDescription);
     setCurrentToolDescription(currentToolDescription);
     setCurrentToolId(0);
+
+    logger->info("Powering Off Attached Tool: {}", discoveryUrl);
 
 
     std::shared_ptr<spdlog::logger> loggerClient = logger->clone(logger->name() + "-client");
@@ -912,6 +895,7 @@ UA_StatusCode KelvinToolchanger::powerOffTool() {
                                                             &powerOffNodeId);
         if (!found) {
             UA_Client_disconnect(client);
+            logger->info("Tool has no PowerOffDevice node");
             return UA_STATUSCODE_GOOD;
         }
 
@@ -947,6 +931,8 @@ UA_StatusCode KelvinToolchanger::detectCurrentTool(const std::string& expectedAp
             .data = const_cast<UA_Byte*>((const UA_Byte*) expectedAppUri.data())
     };
 
+    logger->info("Checking if tool with app uri is registered: {}", expectedAppUri);
+
     std::shared_ptr<RegisteredComponent> foundComponent;
 
     // wait maximum 20 seconds for the device to boot up.
@@ -963,8 +949,10 @@ UA_StatusCode KelvinToolchanger::detectCurrentTool(const std::string& expectedAp
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 
-    if (!foundComponent)
+    if (!foundComponent) {
+        logger->error("No component registered with app uri: {}", expectedAppUri);
         return UA_STATUSCODE_BADNOTFOUND;
+    }
 
     UA_ApplicationDescription_copy(&foundComponent->endpoint->server, &currentToolDescription);
     setCurrentToolDescription(currentToolDescription);
@@ -978,19 +966,22 @@ UA_StatusCode KelvinToolchanger::setCurrentToolDescription(const UA_ApplicationD
     UA_Variant v;
     UA_Variant_init(&v);
     UA_Variant_setScalar(&v, const_cast<UA_ApplicationDescription*>(&description), &UA_TYPES[UA_TYPES_APPLICATIONDESCRIPTION]);
-    return UA_Server_writeValue(server, currentToolDescriptionNode, v);
+    LockedServer ls = server->getLocked();
+    return UA_Server_writeValue(ls.get(), currentToolDescriptionNode, v);
 }
 
 UA_StatusCode KelvinToolchanger::setCurrentToolId(UA_UInt16 id) {
     UA_Variant v;
     UA_Variant_init(&v);
     UA_Variant_setScalar(&v, &id, &UA_TYPES[UA_TYPES_UINT16]);
-    return UA_Server_writeValue(server, currentToolIdNode, v);
+    LockedServer ls = server->getLocked();
+    return UA_Server_writeValue(ls.get(), currentToolIdNode, v);
 }
 
 UA_StatusCode KelvinToolchanger::setCurrentToolReady(UA_Boolean ready) {
     UA_Variant v;
     UA_Variant_init(&v);
     UA_Variant_setScalar(&v, &ready, &UA_TYPES[UA_TYPES_BOOLEAN]);
-    return UA_Server_writeValue(server, currentToolReadyNode, v);
+    LockedServer ls = server->getLocked();
+    return UA_Server_writeValue(ls.get(), currentToolReadyNode, v);
 }

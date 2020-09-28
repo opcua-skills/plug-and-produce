@@ -1,7 +1,10 @@
-//
-// Created by profanter on 12/11/2019.
-// Copyright (c) 2019 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #include "Serial.h"
 #include "esp_log.h"
@@ -27,19 +30,13 @@
 static const char *LOG_TAG = "UART";
 
 Serial::Serial(): connected(false) {
-    uart_config_t uart_config = {
-            .baud_rate = BAUD_RATE,
-            .data_bits = UART_DATA_8_BITS,
-            .parity = UART_PARITY_DISABLE,
-            .stop_bits = UART_STOP_BITS_1,
-            .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-            .rx_flow_ctrl_thresh = 122,
-            .use_ref_tick = false
-    };
-
-
-    uart_param_config(RS485_UART_PORT, &uart_config);
-    uart_set_pin(RS485_UART_PORT, SERIAL_TXD2, SERIAL_RXD2, SERIAL_RTS, SERIAL_CTS);
+    uart_config.baud_rate = BAUD_RATE;
+    uart_config.data_bits = UART_DATA_8_BITS;
+    uart_config.parity = UART_PARITY_DISABLE;
+    uart_config.stop_bits = UART_STOP_BITS_1;
+    uart_config.flow_ctrl = UART_HW_FLOWCTRL_DISABLE;
+    uart_config.rx_flow_ctrl_thresh = 122;
+    uart_config.source_clk = UART_SCLK_APB;
 }
 
 
@@ -58,8 +55,12 @@ Serial::setConnected(const bool& connected)
 void Serial::open() {
     // Install UART driver (we don't need an event queue here)
     // In this example we don't even use a buffer for sending data.
-    uart_driver_install(RS485_UART_PORT, BUF_SIZE * 2, 0, 0, NULL, 0);
-    uart_set_mode(RS485_UART_PORT, UART_MODE_RS485_HALF_DUPLEX);
+    ESP_ERROR_CHECK(uart_driver_install(RS485_UART_PORT, BUF_SIZE * 2, 0, 0, NULL, 0));
+
+    ESP_ERROR_CHECK(uart_param_config(RS485_UART_PORT, &uart_config));
+    ESP_ERROR_CHECK(uart_set_pin(RS485_UART_PORT, SERIAL_TXD2, SERIAL_RXD2, SERIAL_RTS, SERIAL_CTS));
+
+    ESP_ERROR_CHECK(uart_set_mode(RS485_UART_PORT, UART_MODE_RS485_HALF_DUPLEX));
 }
 
 void Serial::close() {

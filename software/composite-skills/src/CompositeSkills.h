@@ -1,7 +1,10 @@
-//
-// Created by profanter on 22/01/2020.
-// Copyright (c) 2020 fortiss GmbH. All rights reserved.
-//
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE', which is part of this source code package.
+ *
+ *    Copyright (c) 2020 fortiss GmbH, Stefan Profanter
+ *    All rights reserved.
+ */
 
 #ifndef COMPOSITE_SKILLS_COMPOSITESKILLS_H
 #define COMPOSITE_SKILLS_COMPOSITESKILLS_H
@@ -17,8 +20,9 @@
 class CompositeSkills {
 public:
     explicit CompositeSkills(
-            std::shared_ptr<spdlog::logger> _logger,
-            UA_Server* server,
+            std::shared_ptr<spdlog::logger> _loggerApp,
+            std::shared_ptr<spdlog::logger> _loggerOpcua,
+            const std::shared_ptr<fortiss::opcua::OpcUaServer>& server,
             const libconfig::Setting& compositeSettings,
             const std::string& clientCertPath,
             const std::string& clientKeyPath,
@@ -57,7 +61,8 @@ public:
 
 private:
     std::shared_ptr<spdlog::logger> logger;
-    UA_Server* server;
+    std::shared_ptr<spdlog::logger> loggerOpcua;
+    const std::shared_ptr<fortiss::opcua::OpcUaServer> server;
 
     bool createNodesFromNodeset();
 
@@ -70,7 +75,7 @@ private:
     const std::string clientKeyPath;
     const std::string clientAppUri;
     const std::string clientName;
-    std::map<std::string, bool> serverKnown;
+
     std::map<std::string, rl::math::Transform> objectPositions;
 
 
