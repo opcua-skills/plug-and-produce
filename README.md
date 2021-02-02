@@ -8,6 +8,9 @@ The concept behind this repository and system architecture is presented in the f
 **A Generic Plug Produce System composed of Semantic OPC UA Skills**.
 Stefan Profanter, Alexander Perzylo, Markus Rickert and Alois Knoll.
 
+[Available as Open Access in the IEEE Open Journal of the Industrial Electronics Society](https://ieeexplore.ieee.org/document/9340379)
+
+
 Full video is available here: https://www.youtube.com/watch?v=iu85tnm0qfk
 
 [![Watch the video](plug-produce-skills-simulation.gif)](https://www.youtube.com/watch?v=iu85tnm0qfk)
