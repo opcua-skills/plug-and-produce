@@ -14,7 +14,7 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
+    # The type of runner that the job will run on. Tested with Ubuntu 20.04
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -31,7 +31,7 @@ jobs:
         git submodule update --init --recursive
 
     - name: Install dependencies for RL
-      run: sudo apt-add-repository ppa:roblib/ppa && sudo apt update && sudo apt-get install -y --no-install-recommends freeglut3-dev libboost-dev libbullet-dev libbullet-extras-dev libcgal-dev libcurl4-openssl-dev libcoin80-dev libdc1394-22-dev libeigen3-dev freeglut3-dev libgraphviz-dev libnlopt-dev libode-dev libopencv-dev qtbase5-dev libsimage-dev libsoqt4-dev libsolid3d-dev libxml2-dev libxslt1-dev libzip-dev libconfig++-dev libmbedtls-dev python-netifaces
+      run: sudo apt-add-repository ppa:roblib/ppa && sudo apt update && sudo apt-get install -y --no-install-recommends build-essential gcc-8 g++-8 libboost-dev libbullet-dev libbullet-extras-dev libcgal-dev libcurl4-openssl-dev libcoin-dev libdc1394-22-dev libeigen3-dev freeglut3-dev libgraphviz-dev libnlopt-dev libode-dev libopencv-dev qtbase5-dev libsimage-dev libsoqt-dev libsolid3d-dev libxml2-dev libxslt1-dev libzip-dev libconfig++-dev libmbedtls-dev python-netifaces
 
     - name: Install rl
       run: ./software/semantic-mes/deps/common/tools/install_rl.sh cba76ed3e54676d430205a0dfdf03ce33ed3850c
