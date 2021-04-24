@@ -36,6 +36,7 @@ As of now the code within this repository is not open source, but publicly avail
 
 This demo depends on a few packages:
 
+* Ubuntu 20.04
 * open62541: Open Source OPC UA Stack (https://github.com/open62541/open62541), Commit: [dac2c98d3b9722fb1971780d34996ea64bf65445](https://github.com/open62541/open62541/commit/dac2c98d3b9722fb1971780d34996ea64bf65445)
 * RoboticsLibrary: Open Source Library for Robot Algorithms and Simulation (https://github.com/roboticslibrary/rl), Commit: [cba76ed3e54676d430205a0dfdf03ce33ed3850c](https://github.com/roboticslibrary/rl/commit/cba76ed3e54676d430205a0dfdf03ce33ed3850c)
 * CLI11: Command line parameter parsing (https://github.com/CLIUtils/CLI11)
