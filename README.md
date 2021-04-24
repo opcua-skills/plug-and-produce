@@ -18,7 +18,6 @@ Full video is available here: https://www.youtube.com/watch?v=iu85tnm0qfk
 ## License
 
 As of now the code within this repository is not open source, but publicly available. All rights are reserved to fortiss.
-This will most likely change in the near future to a more community-friendly License like BSD or MIT.
 
 **NOTE:**
 > THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -41,14 +40,14 @@ This demo depends on a few packages:
 * CLI11: Command line parameter parsing (https://github.com/CLIUtils/CLI11)
 
 
-A full list of dependencies which are required for building this repo should be taken from the corresponding docker image configuration:
+A full list of dependencies which are required for building this repo should be taken from the corresponding CI Pipeline configuration:
 
-[main.yml](.gihtub/workflows/main.yml)
+[main.yml](.github/workflows/main.yml)
 
 
 To summarize, you will need the following packages:
 
-`libconfig++-dev`, open62541, cli11, and a current RoboticsLibrary version.
+`libconfig++-dev`, `open62541`, `cli11`, and a current `RoboticsLibrary` version.
 
 ## Build project
 
